@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule !.(\.gif|\.jpg|\.png|\.swf|\.xml|\.html|\.txt)$ server.php
