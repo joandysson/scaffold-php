@@ -1,9 +1,11 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
 
-require_once dirname(__DIR__).'\config\autoload.php';
-require_once dirname(__DIR__).'\config\functions.php';
-require_once dirname(__DIR__).'\config\variables.php';
-new \Config\Router\Router;
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(dirname(__DIR__));
+$dotenv->load();
+
+errorReporting(true);
+
+new \App\Config\Router\Router;
