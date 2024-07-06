@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="<?php echo $langText['html']['lang'] ?>">
+<html lang="">
 
 <head>
     <?php include 'layouts/head.php' ?>
