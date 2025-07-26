@@ -5,6 +5,7 @@ namespace App\Config\Response;
 
 use App\Config\Response\HttpStatus;
 use RuntimeException;
+use BadMethodCallException;
 
 class Response
 {
@@ -69,5 +70,14 @@ class Response
     public function getHeaders(): array
     {
         return $this->headers;
+    }
+
+    public static function __callStatic(string $name, array $arguments): mixed
+    {
+        $instance = new self();
+        if (!method_exists($instance, $name)) {
+            throw new BadMethodCallException("Method {$name} not found in " . self::class);
+        }
+        return $instance->$name(...$arguments);
     }
 }

@@ -3,7 +3,7 @@
 use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
-use App\Config\Response\ResponseFacade;
+use App\Config\Response\Response;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -42,7 +42,7 @@ Router::get('/contact', 'HomeController:contact', 'contact.page');
 Router::run();
 
 if (Router::error()) {
-    ResponseFacade::json(
+    Response::json(
         ['error' => 'Not Found'],
         HttpStatus::NOT_FOUND
     );
