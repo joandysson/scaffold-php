@@ -13,6 +13,7 @@ RUN apt-get update && \
 RUN apt-get install libzip-dev libssl-dev pkg-config -y; \
     docker-php-ext-install zip
 RUN pecl install mongodb && docker-php-ext-enable mongodb
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 RUN apt-get update; apt-get install curl -y; service apache2 restart;
 
