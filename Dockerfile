@@ -31,4 +31,7 @@ RUN service apache2 restart
 # Copy application files
 COPY . /var/www/html
 
-#  vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-filter=app tests
+# Set permissions for the application directory
+RUN mkdir -p /var/www/html/storage/logs \
+    && chown -R www-data:www-data /var/www/html/storage \
+    && chmod -R 775 /var/www/html/storage

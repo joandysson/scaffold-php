@@ -8,3 +8,4 @@ newsletter_position_file.json
 .DS_Store
 .phpunit.cache
 coverage.xml
+app/storage/logs/*
