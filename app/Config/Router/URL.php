@@ -14,19 +14,19 @@ class URL
 
     public static function get($positions): string
     {
-        static::checkURL();
+        self::checkURL();
         $positions = func_get_args();
 
         if (! count($positions)) {
-            return implode('/', static::$url);
+            return implode('/', self::$url);
         }
 
         $urlReturn = [];
         foreach ($positions as $position) {
-            if (! array_key_exists($position, static::$url)) {
+            if (! array_key_exists($position, self::$url)) {
                 continue;
             }
-            $urlReturn[] = static::$url[$position];
+            $urlReturn[] = self::$url[$position];
         }
 
         return implode('/', $urlReturn);
@@ -34,7 +34,7 @@ class URL
 
     private static function checkURL(): void
     {
-        if (count(static::$url)) {
+        if (count(self::$url)) {
             return;
         }
 
@@ -44,6 +44,6 @@ class URL
         if (empty($url[0])) {
             array_shift($url);
         }
-        static::$url = $url;
+        self::$url = $url;
     }
 }

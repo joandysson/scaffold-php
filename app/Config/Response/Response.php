@@ -36,4 +36,14 @@ class Response
         $this->setStatus($status);
         echo $content;
     }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
 }

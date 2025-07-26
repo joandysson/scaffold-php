@@ -47,7 +47,7 @@ abstract class Dispatch
         self::$patch = explode('?', $_SERVER['REQUEST_URI'])[0];
 
         if (empty(self::$routes) || empty(self::$routes[self::$httpMethod])) {
-            self::$error = self::$NOT_IMPLEMENTED;
+            self::$error = self::NOT_IMPLEMENTED;
             return false;
         }
 
@@ -81,15 +81,15 @@ abstract class Dispatch
                     return true;
                 }
 
-                self::$error = self::$METHOD_NOT_ALLOWED;
+                self::$error = self::METHOD_NOT_ALLOWED;
                 return false;
             }
 
-            self::$error = self::$BAD_REQUEST;
+            self::$error = self::BAD_REQUEST;
             return false;
         }
 
-        self::$error = self::$NOT_FOUND;
+        self::$error = self::NOT_FOUND;
         return false;
     }
 

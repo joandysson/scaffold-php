@@ -179,8 +179,8 @@ class Router extends Dispatch
     {
         $route = explode('/', $_SERVER['REDIRECT_URL']);
 
-        if ($slice === null) {
-            return $route[$slice];
+        if ($slice !== null) {
+            return $route[$slice] ?? '';
         }
 
         return $route;

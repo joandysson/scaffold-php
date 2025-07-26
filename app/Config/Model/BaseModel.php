@@ -93,7 +93,7 @@ abstract class BaseModel extends Connection
             return $stmt->rowCount();
         } catch (PDOException $e) {
             echo $e->getMessage();
-            return false;
+            return 0;
         }
     }
 
@@ -192,7 +192,7 @@ abstract class BaseModel extends Connection
 
             $newDataPDO = [];
             foreach ($dataPDO as $key2 => $value2) {
-                $newDataPDO[$key2 . $key + 1] = $value2;
+                $newDataPDO[$key2 . ($key + 1)] = $value2;
             }
 
             $dataValues[] = '(' . implode(',', array_keys($newDataPDO)) . ')';
