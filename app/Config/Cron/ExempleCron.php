@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
-namespace App\Config\Cron\Quiz;
+namespace App\Config\Cron;
 
 use App\Config\Cron\CronInterface;
 
-class ExempleCron implements CronInterface
+final class ExempleCron implements CronInterface
 {
     public function run(): void
     {
