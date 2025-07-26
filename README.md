@@ -27,7 +27,17 @@ necessária, evitando conexões antecipadas.
 
 #### Configurações de ambiente
 
-As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. Entre elas, `APP_DEBUG` controla a exibição de erros e `LOG_DRIVER` define o tipo de logger utilizado (`file` ou `error_log`).
+As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. A tabela a seguir explica as principais chaves:
+
+|Variável|Descrição|
+|---|---|
+|`APP_URL`|Endereço base da aplicação.|
+|`DB_DRIVER`, `DB_NAME`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`|Configurações do banco de dados MySQL utilizado pelo `BaseModel`.|
+|`APP_STAGE`|Fase do projeto (`local`, `prod`, etc.).|
+|`APP_DEBUG`|Habilita a exibição de erros no navegador quando definido como `true`.|
+|`LOG_DRIVER`|Define onde os logs são gravados (`file` gera arquivos em `storage/logs/`, `error_log` envia para o log do PHP).|
+
+Há chaves extras como `SAFE_BROWSING_URL` ou `MONGO_USER` que servem como exemplo para integrações futuras e podem ser removidas se não forem necessárias.
 
 #### Exemplo de roteamento
 
@@ -65,6 +75,12 @@ tests/      Testes PHPUnit
 docker/     Imagens e configurações do Docker
 ```
 
+* `app/Controllers` contém as classes responsáveis por tratar as requisições.
+* `app/Models` guarda os modelos de domínio, que podem herdar de `BaseModel`.
+* `public/` mantém `index.php` e templates de visualização.
+* `storage/` é usado para logs e arquivos temporários.
+* `docker/` concentra os arquivos de configuração das imagens utilizadas.
+
 ### Como instalar
 
 1. Clone este repositório.
@@ -91,5 +107,14 @@ uma delas manualmente utilize:
 php run-cron.php NomeDaTarefa
 ```
 
-O script `cron.sh` é um facilitador que pode ser utilizado em servidores para 
-agendar execuções recorrentes.
+O script `cron.sh` é um facilitador que pode ser utilizado em servidores para
+agendar execuções recorrentes. Edite `app/Config/cron.php` para adicionar novas
+tarefas ou ajustar a periodicidade das existentes. Logs das execuções são salvos
+em `storage/logs/cron.log` quando `LOG_DRIVER` estiver configurado como `file`.
+
+### Escrevendo testes
+
+Os testes ficam na pasta `tests/` e utilizam PHPUnit. Para criar novos testes de
+rotas é possível simular requisições definindo variáveis `$_SERVER` e chamando
+`Router::run()`, como demonstrado em `RouterInjectionTest.php`. Serviços podem
+ser mockados normalmente através das ferramentas do PHPUnit.
