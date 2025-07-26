@@ -80,7 +80,10 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return parent::$conn->lastInsertId();
         } catch (PDOException $e) {
-            dd($e->getMessage());
+            \App\Config\Log\Log::error($e->getMessage());
+            if (getenv('APP_DEBUG') === 'true') {
+                echo $e->getMessage();
+            }
             return false;
         }
     }
