@@ -79,7 +79,7 @@ docker/     Imagens e configurações do Docker
 - `composer phpcs` roda o linter do código.
 - `composer phpstan` executa a análise estática.
 - `composer audit` verifica vulnerabilidades nas dependências.
-- `make cron name=ExempleCron` executa uma tarefa agendada de exemplo.
+- `make cron name=ExampleCron` executa uma tarefa agendada de exemplo. Quando o nome for omitido, o script mostrará as tarefas disponíveis.
 - `make ci` roda todas as verificações e testes dentro do container.
 
 ### Tarefas agendadas
