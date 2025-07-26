@@ -1,1 +1,10 @@
-node_modules
+.git
+vendor/
+node_modules/
+Dockerfile
+docker-compose.yml
+docker/
+storage/
+tests/
+.env
+

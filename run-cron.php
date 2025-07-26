@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use App\Config\Cron\CronInterface;
-use App\Config\Cron\ExempleCron;
 
 require_once 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
@@ -12,14 +11,14 @@ $dotenv->load();
 
 if (!isset($argv[1])) {
     echo 'Any task was provided.';
+    exit();
 }
 
 $task = $argv[1];
 
-$cron = match ($task) {
-    'ExempleCron' => new ExempleCron(),
-    default => "Task '{$task}' not found."
-};
+$tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'cron.php';
+
+$cron = isset($tasks[$task]) ? new $tasks[$task]() : "Task '{$task}' not found.";
 
 if ($cron instanceof CronInterface) {
 
