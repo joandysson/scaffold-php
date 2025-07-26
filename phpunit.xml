@@ -12,9 +12,9 @@
     </testsuites>
 
     <coverage>
-        <include>
+        <source>
             <directory suffix=".php">app</directory>
-        </include>
+        </source>
         <clover outputFile="coverage.xml"/>
     </coverage>
 </phpunit>
