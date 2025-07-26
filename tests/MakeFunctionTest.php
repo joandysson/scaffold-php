@@ -35,4 +35,10 @@ class MakeFunctionTest extends TestCase
         $params = make($callable, ['id' => 1, 'slug' => 'a']);
         $this->assertSame([1, 'a'], $params);
     }
+
+    public function testMakeInstantiateClassWithString(): void
+    {
+        $object = make(Dummy::class);
+        $this->assertInstanceOf(Dummy::class, $object);
+    }
 }
