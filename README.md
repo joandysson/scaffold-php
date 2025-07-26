@@ -24,7 +24,7 @@ Este projeto fornece uma estrutura inicial simples em PHP para aplicações que 
 
 #### Configurações de ambiente
 
-As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade.
+As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. Entre elas, `APP_DEBUG` controla a exibição de erros e `LOG_DRIVER` define o tipo de logger utilizado (`file` ou `error_log`).
 
 #### Rotas de exemplo
 

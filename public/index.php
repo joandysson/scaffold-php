@@ -20,7 +20,7 @@ if (getenv('APP_STAGE') === 'PROD') {
     ]);
 }
 
-errorReporting(getenv('APP_DEBUG') === 'true' ? E_ALL : 0);
+errorReporting(getenv('APP_DEBUG') === 'true');
 
 try {
     new Router;
@@ -29,5 +29,8 @@ try {
         captureException($exception);
     }
 
-    dd($exception->getMessage());
+    \App\Config\Log\Log::error($exception->getMessage());
+    if (getenv('APP_DEBUG') === 'true') {
+        echo $exception->getMessage();
+    }
 }

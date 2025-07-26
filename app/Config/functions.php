@@ -55,11 +55,15 @@ function asset(string $file): string
     return getenv('APP_URL') . '/' . "public" . '/' . "assets" . '/' . "{$file}";
 }
 
-function dd(mixed $data)
+function dd(mixed $data): void
 {
-    echo '<pre>';
-    var_dump($data);
-    die;
+    if (getenv('APP_DEBUG') === 'true') {
+        echo '<pre>';
+        var_dump($data);
+        die;
+    }
+
+    \App\Config\Log\Log::error(is_string($data) ? $data : var_export($data, true));
 }
 
 /**
@@ -68,8 +72,12 @@ function dd(mixed $data)
  */
 function pd(mixed $data): void
 {
-    echo '<pre>', print_r($data, true);
-    die;
+    if (getenv('APP_DEBUG') === 'true') {
+        echo '<pre>', print_r($data, true);
+        die;
+    }
+
+    \App\Config\Log\Log::error(is_string($data) ? $data : var_export($data, true));
 }
 
 /**
