@@ -3,9 +3,7 @@ require_once __DIR__ . '/../app/Config/functions.php';
 
 use PHPUnit\Framework\TestCase;
 use App\Config\Request\Request;
-use App\Config\Request\RequestFacade;
 use App\Config\Response\Response;
-use App\Config\Response\ResponseFacade;
 use App\Config\Response\HttpStatus;
 
 class RequestTest extends TestCase
@@ -46,14 +44,15 @@ class RequestTest extends TestCase
         $this->assertSame('test.txt', $request->files()['file']['name']);
     }
 
-    public function testStaticRequestMagicCall(): void
+    public function testRequestFacadeBehavior(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/static';
         $_GET = [];
 
-        $this->assertSame('GET', RequestFacade::method());
-        $this->assertSame('/static', RequestFacade::path());
+        $request = new Request();
+        $this->assertSame('GET', $request->method());
+        $this->assertSame('/static', $request->path());
     }
 
     public function testResponseJson()
@@ -67,10 +66,11 @@ class RequestTest extends TestCase
         $this->assertSame(HttpStatus::CREATED->value, http_response_code());
     }
 
-    public function testStaticResponseMagicCall(): void
+    public function testResponseFacadeBehavior(): void
     {
+        $response = new Response();
         ob_start();
-        ResponseFacade::json(['b' => 2], HttpStatus::CREATED);
+        $response->json(['b' => 2], HttpStatus::CREATED);
         $output = ob_get_clean();
 
         $this->assertSame('{"b":2}', $output);
