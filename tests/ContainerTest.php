@@ -6,6 +6,15 @@ use App\Config\Container\Container;
 use App\Config\Request\Request;
 
 class Service {}
+class Dependency {}
+class ServiceWithDependency
+{
+    public Dependency $dep;
+    public function __construct(Dependency $dep)
+    {
+        $this->dep = $dep;
+    }
+}
 
 class ContainerTest extends TestCase
 {
@@ -28,5 +37,11 @@ class ContainerTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/foo';
         $params = make(function (Request $r) {}, ['id' => 10]);
         $this->assertSame(['id' => 10], $params[0]->getRouteParams());
+    }
+
+    public function testAutoResolveDependencies(): void
+    {
+        $object = Container::get(ServiceWithDependency::class);
+        $this->assertInstanceOf(Dependency::class, $object->dep);
     }
 }

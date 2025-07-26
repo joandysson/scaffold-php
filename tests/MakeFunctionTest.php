@@ -28,4 +28,11 @@ class MakeFunctionTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $params[0]);
         $this->assertInstanceOf(Request::class, $params[1]);
     }
+
+    public function testMakeInjectsRouteParameters(): void
+    {
+        $callable = function (int $id, string $slug) {};
+        $params = make($callable, ['id' => 1, 'slug' => 'a']);
+        $this->assertSame([1, 'a'], $params);
+    }
 }

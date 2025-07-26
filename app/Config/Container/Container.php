@@ -19,20 +19,46 @@ class Container
 
     public static function get(string $id): object
     {
-        if (!isset(self::$bindings[$id])) {
-            return new $id();
+        $target = $id;
+
+        if (isset(self::$bindings[$id])) {
+            $concrete = self::$bindings[$id];
+            if ($concrete instanceof Closure) {
+                return $concrete();
+            }
+
+            if (is_object($concrete)) {
+                return $concrete;
+            }
+
+            $target = is_string($concrete) ? $concrete : $id;
         }
 
-        $concrete = self::$bindings[$id];
-        if ($concrete instanceof Closure) {
-            return $concrete();
+        return self::build($target);
+    }
+
+    private static function build(string $class): object
+    {
+        $ref = new \ReflectionClass($class);
+        $constructor = $ref->getConstructor();
+
+        if ($constructor === null) {
+            return new $class();
         }
 
-        if (is_string($concrete)) {
-            return new $concrete();
+        $params = [];
+        foreach ($constructor->getParameters() as $param) {
+            $type = $param->getType();
+            if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                $params[] = self::get($type->getName());
+            } elseif ($param->isDefaultValueAvailable()) {
+                $params[] = $param->getDefaultValue();
+            } else {
+                $params[] = null;
+            }
         }
 
-        return $concrete;
+        return $ref->newInstanceArgs($params);
     }
 
     public static function clear(): void

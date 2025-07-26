@@ -189,7 +189,17 @@ function make(callable $callable, array $routeParams = []): array
                     $object->setRouteParams($routeParams);
                 }
                 $parameters[] = $object;
+                continue;
             }
+        }
+
+        $name = $param->getName();
+        if (array_key_exists($name, $routeParams)) {
+            $parameters[] = $routeParams[$name];
+        } elseif ($param->isDefaultValueAvailable()) {
+            $parameters[] = $param->getDefaultValue();
+        } else {
+            $parameters[] = null;
         }
     }
 
