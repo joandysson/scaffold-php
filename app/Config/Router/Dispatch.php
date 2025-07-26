@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace App\Config\Router;
 
+use App\Config\Response\HttpStatus;
+use App\Config\Request\Request;
+use RuntimeException;
+
 abstract class Dispatch
 {
     protected static string $httpMethod;
@@ -15,10 +19,10 @@ abstract class Dispatch
     protected static ?int $error = null;
     protected static array $middlewares = [];
 
-    public const BAD_REQUEST = \App\Config\Response\HttpStatus::BAD_REQUEST->value;
-    public const NOT_FOUND = \App\Config\Response\HttpStatus::NOT_FOUND->value;
-    public const METHOD_NOT_ALLOWED = \App\Config\Response\HttpStatus::METHOD_NOT_ALLOWED->value;
-    public const NOT_IMPLEMENTED = \App\Config\Response\HttpStatus::NOT_IMPLEMENTED->value;
+    public const BAD_REQUEST = HttpStatus::BAD_REQUEST->value;
+    public const NOT_FOUND = HttpStatus::NOT_FOUND->value;
+    public const METHOD_NOT_ALLOWED = HttpStatus::METHOD_NOT_ALLOWED->value;
+    public const NOT_IMPLEMENTED = HttpStatus::NOT_IMPLEMENTED->value;
 
     public function __construct()
     {
@@ -74,13 +78,13 @@ abstract class Dispatch
                 $params = make(self::$route['handler'], self::$route['data'] ?? []);
                 $request = null;
                 foreach ($params as $p) {
-                    if ($p instanceof \App\Config\Request\Request) {
+                    if ($p instanceof Request) {
                         $request = $p;
                         break;
                     }
                 }
                 if ($request === null) {
-                    $request = new \App\Config\Request\Request();
+                    $request = new Request();
                     $request->setRouteParams(self::$route['data'] ?? []);
                 }
                 foreach (self::$middlewares as $middleware) {
@@ -95,26 +99,26 @@ abstract class Dispatch
 
             if (!class_exists($controller)) {
                 self::$error = self::BAD_REQUEST;
-                throw new \RuntimeException("Controller {$controller} not found");
+                throw new RuntimeException("Controller {$controller} not found");
             }
 
             $newController = new $controller();
 
             if (!method_exists($controller, $method)) {
                 self::$error = self::METHOD_NOT_ALLOWED;
-                throw new \RuntimeException("Method {$method} not found in {$controller}");
+                throw new RuntimeException("Method {$method} not found in {$controller}");
             }
 
             $params = make([$newController, $method], self::$route['data'] ?? []);
             $request = null;
             foreach ($params as $p) {
-                if ($p instanceof \App\Config\Request\Request) {
+                if ($p instanceof Request) {
                     $request = $p;
                     break;
                 }
             }
             if ($request === null) {
-                $request = new \App\Config\Request\Request();
+                $request = new Request();
                 $request->setRouteParams(self::$route['data'] ?? []);
             }
             foreach (self::$middlewares as $middleware) {
