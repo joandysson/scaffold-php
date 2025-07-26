@@ -167,10 +167,14 @@ function section(Closure $fun) {
 }
 
 /**
- * Resolve and instantiate class dependencies for a callable.
+ * Resolve and instantiate class dependencies for a callable or a class name.
  */
-function make(callable $callable, array $routeParams = []): array
+function make(callable|string $callable, array $routeParams = []): array|object
 {
+    if (is_string($callable) && class_exists($callable)) {
+        return \App\Config\Container\Container::get($callable);
+    }
+
     $parameters = [];
 
     if (is_array($callable)) {
