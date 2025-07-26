@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Config\Request;
 
 use App\Config\Validation\Validator;
+use BadMethodCallException;
 
 class Request
 {
@@ -94,5 +95,14 @@ class Request
     public function validate(array $rules): array
     {
         return Validator::validate($this->body, $rules);
+    }
+
+    public static function __callStatic(string $name, array $arguments): mixed
+    {
+        $instance = new self();
+        if (!method_exists($instance, $name)) {
+            throw new BadMethodCallException("Method {$name} not found in " . self::class);
+        }
+        return $instance->$name(...$arguments);
     }
 }
