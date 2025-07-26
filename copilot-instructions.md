@@ -13,7 +13,7 @@ O projeto “Scaffold PHP” oferece uma estrutura básica em Docker para aplica
 1. Levante os containers com `docker compose up -d`.
 2. Rode a rotina de verificações local com `make ci`, que executa `composer phpcs`, `composer phpstan`, `composer audit` e `composer test`.
 3. O GitHub Actions realiza essas mesmas etapas em pull requests.
-4. Para tarefas em lote, utilize o script `cron.sh` (ex.: `make cron name=ExempleCron`).
+4. Para tarefas em lote, utilize o script `cron.sh` (ex.: `make cron name=ExampleCron`).
 
 ## 4. Estrutura das pastas
 ```

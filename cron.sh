@@ -15,7 +15,7 @@ fi
 
 : '
   Jobs
-  - ExempleCron
+  - ExampleCron
 '
 
 echo "Running cron job $1"
