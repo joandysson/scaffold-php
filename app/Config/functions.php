@@ -184,12 +184,22 @@ function make(callable $callable, array $routeParams = []): array
         if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
             $className = $type->getName();
             if (class_exists($className)) {
-                $object = new $className();
+                $object = \App\Config\Container\Container::get($className);
                 if ($object instanceof \App\Config\Request\Request) {
                     $object->setRouteParams($routeParams);
                 }
                 $parameters[] = $object;
+                continue;
             }
+        }
+
+        $name = $param->getName();
+        if (array_key_exists($name, $routeParams)) {
+            $parameters[] = $routeParams[$name];
+        } elseif ($param->isDefaultValueAvailable()) {
+            $parameters[] = $param->getDefaultValue();
+        } else {
+            $parameters[] = null;
         }
     }
 
