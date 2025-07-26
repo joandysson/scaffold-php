@@ -10,17 +10,18 @@ require_once 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'fun
 $dotenv = Dotenv\Dotenv::createUnsafeImmutable('.');
 $dotenv->load();
 
-if (!isset($argv[1])) {
-    echo "No task provided." . PHP_EOL;
-    exit(1);
-}
-
 $runner = new CronRunner();
 $runner->register('ExampleCron', new ExampleCron());
+
+if (!isset($argv[1])) {
+    echo 'No task provided. Available tasks: ' . implode(', ', $runner->registeredTasks()) . PHP_EOL;
+    exit(1);
+}
 
 try {
     $runner->run($argv[1]);
 } catch (InvalidArgumentException $e) {
     echo $e->getMessage() . PHP_EOL;
+    echo 'Available tasks: ' . implode(', ', $runner->registeredTasks()) . PHP_EOL;
     exit(1);
 }

@@ -29,4 +29,11 @@ class CronRunnerTest extends TestCase
         $runner = new CronRunner();
         $runner->run('missing');
     }
+
+    public function testRegisteredTasks(): void
+    {
+        $runner = new CronRunner();
+        $runner->register('dummy', new DummyCron());
+        $this->assertSame(['dummy'], $runner->registeredTasks());
+    }
 }
