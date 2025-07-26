@@ -7,3 +7,4 @@ quiz_position.json
 newsletter_position_file.json
 .DS_Store
 .phpunit.cache
+coverage.xml

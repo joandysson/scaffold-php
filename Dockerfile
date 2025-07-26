@@ -1,30 +1,34 @@
 FROM php:8.2-apache
 
+# Install basic PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
-RUN set -eux; apt-get update; apt-get install -y git
+# Install required packages to compile PHP extensions
+RUN set -eux; apt-get update; apt-get install -y git curl libicu-dev libzip-dev libssl-dev pkg-config
 
-COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
+# Install intl and zip extensions
+RUN docker-php-ext-install intl zip
 
-RUN apt-get update && \
-    apt-get install -y libicu-dev && \
-    docker-php-ext-install intl
-
-RUN apt-get install libzip-dev libssl-dev pkg-config -y; \
-    docker-php-ext-install zip
+# Install and enable MongoDB extension
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
-RUN apt-get update; apt-get install curl -y; service apache2 restart;
+# Install Composer
+COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
 
-# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && set -eux; \
-#     apt-get update; \
-#     apt-get install -y nodejs; \
-#     npm install -g npm; \
-#     npm install --global yarn; \
-#     npm install --global gulp-cli;
+# Install and configure Xdebug
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# Enable Apache modules
+RUN a2enmod rewrite headers
+
+# Restart Apache (can be removed if using default ENTRYPOINT)
+RUN service apache2 restart
+
+# Copy application files
 COPY . /var/www/html
 
-RUN a2enmod rewrite
-
-RUN a2enmod headers && service apache2 restart
+#  vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-filter=app tests
