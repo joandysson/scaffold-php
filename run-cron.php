@@ -1,7 +1,8 @@
 <?php
+declare(strict_types=1);
 
 use App\Config\Cron\CronInterface;
-use App\Config\Cron\Quiz\ExempleCron;
+use App\Config\Cron\ExempleCron;
 
 require_once 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';

@@ -1,21 +1,24 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Config\Router;
 
 abstract class Dispatch
 {
-    protected static mixed $httpMethod;
-    protected static mixed $routes;
-    protected static mixed $route;
+    protected static string $httpMethod;
+    protected static array $routes = [];
+    protected static ?array $route = null;
     protected static string $patch;
-    protected static mixed $projectUrl = null;
+    protected static ?string $projectUrl = null;
     protected static string $separator;
-    protected static mixed $group = null;
-    protected static mixed $data = null;
-    protected static mixed $error = null;
-    public static int $BAD_REQUEST = 400;
-    public static int $NOT_FOUND = 404;
-    public static int $METHOD_NOT_ALLOWED = 405;
-    public static int $NOT_IMPLEMENTED = 501;
+    protected static ?string $group = null;
+    protected static ?array $data = null;
+    protected static ?int $error = null;
+
+    public const BAD_REQUEST = 400;
+    public const NOT_FOUND = 404;
+    public const METHOD_NOT_ALLOWED = 405;
+    public const NOT_IMPLEMENTED = 501;
 
     public function __construct()
     {
@@ -24,22 +27,22 @@ abstract class Dispatch
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
     }
 
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return self::$routes;
     }
 
-    public static function group($group = null): mixed
+    public static function group(?string $group = null): ?string
     {
         return self::$group = ($group ? str_replace('/', '', $group) : null);
     }
 
-    public function data(): mixed
+    public function data(): ?array
     {
         return self::$data;
     }
 
-    public static function error(): mixed
+    public static function error(): ?int
     {
         return self::$error;
     }
