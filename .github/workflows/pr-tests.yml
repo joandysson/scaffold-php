@@ -48,10 +48,11 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          coverage: xdebug
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
       - name: Run tests with coverage
-        run: phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml tests
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml tests
       - name: Calculate coverage summary
         id: coverage
         run: |
