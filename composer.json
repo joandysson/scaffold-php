@@ -42,8 +42,7 @@
         "phpcbf": [
             "./vendor/bin/phpcbf ./app"
         ],
-        "phpstan": "./vendor/bin/phpstan analyse -c phpstan.neon.dist",
-        "audit": "composer audit --no-interaction"
+        "phpstan": "./vendor/bin/phpstan analyse -c phpstan.neon.dist"
     },
     "config": {
         "allow-plugins": {

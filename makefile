@@ -13,7 +13,7 @@ down:
 
 # Executa todos os testes e analises no container
 ci:
-	docker exec -it app composer phpcs
-	docker exec -it app composer phpstan
-	docker exec -it app composer audit --no-interaction
-	docker exec -it app composer test
+       docker exec -it app composer phpcs
+       docker exec -it app composer phpstan
+       docker exec -it app composer audit --no-interaction
+       docker exec -it app composer test
