@@ -4,6 +4,7 @@ require_once __DIR__ . '/../app/Config/functions.php';
 use PHPUnit\Framework\TestCase;
 use App\Config\Request\Request;
 use App\Config\Response\Response;
+use App\Config\Response\HttpStatus;
 
 class RequestTest extends TestCase
 {
@@ -47,10 +48,10 @@ class RequestTest extends TestCase
     {
         $response = new Response();
         ob_start();
-        $response->json(['a' => 1], 201);
+        $response->json(['a' => 1], HttpStatus::CREATED);
         $output = ob_get_clean();
 
         $this->assertSame('{"a":1}', $output);
-        $this->assertSame(201, http_response_code());
+        $this->assertSame(HttpStatus::CREATED->value, http_response_code());
     }
 }

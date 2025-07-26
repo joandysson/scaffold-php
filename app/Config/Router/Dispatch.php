@@ -14,10 +14,10 @@ abstract class Dispatch
     protected static ?string $group = null;
     protected static ?int $error = null;
 
-    public const BAD_REQUEST = 400;
-    public const NOT_FOUND = 404;
-    public const METHOD_NOT_ALLOWED = 405;
-    public const NOT_IMPLEMENTED = 501;
+    public const BAD_REQUEST = \App\Config\Response\HttpStatus::BAD_REQUEST->value;
+    public const NOT_FOUND = \App\Config\Response\HttpStatus::NOT_FOUND->value;
+    public const METHOD_NOT_ALLOWED = \App\Config\Response\HttpStatus::METHOD_NOT_ALLOWED->value;
+    public const NOT_IMPLEMENTED = \App\Config\Response\HttpStatus::NOT_IMPLEMENTED->value;
 
     public function __construct()
     {

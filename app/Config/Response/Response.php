@@ -2,15 +2,18 @@
 
 namespace App\Config\Response;
 
+use App\Config\Response\HttpStatus;
+
 class Response
 {
-    private int $status = 200;
+    private int $status = HttpStatus::OK->value;
     private array $headers = [];
 
-    public function setStatus(int $status): self
+    public function setStatus(int|HttpStatus $status): self
     {
-        $this->status = $status;
-        http_response_code($status);
+        $code = $status instanceof HttpStatus ? $status->value : $status;
+        $this->status = $code;
+        http_response_code($code);
         return $this;
     }
 
@@ -21,14 +24,14 @@ class Response
         return $this;
     }
 
-    public function json(array $data, int $status = 200): void
+    public function json(array $data, int|HttpStatus $status = HttpStatus::OK): void
     {
         $this->setStatus($status);
         $this->addHeader('Content-Type', 'application/json');
         echo json_encode($data);
     }
 
-    public function send(string $content, int $status = 200): void
+    public function send(string $content, int|HttpStatus $status = HttpStatus::OK): void
     {
         $this->setStatus($status);
         echo $content;

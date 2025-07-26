@@ -3,6 +3,7 @@
 namespace App\Config\Router;
 
 use Closure;
+use App\Config\Response\HttpStatus;
 
 class Router extends Dispatch
 {
@@ -118,9 +119,14 @@ class Router extends Dispatch
         return null;
     }
 
-    public static function redirect(string $route, $data = null, $status = 301): void
+    public static function redirect(
+        string $route,
+        $data = null,
+        int|HttpStatus $status = HttpStatus::MOVED_PERMANENTLY
+    ): void
     {
-        http_response_code($status);
+        $code = $status instanceof HttpStatus ? $status->value : $status;
+        http_response_code($code);
 
         if ($name = self::route($route, $data)) {
             header("Location: {$name}");
