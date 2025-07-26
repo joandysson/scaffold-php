@@ -198,7 +198,8 @@ class Router extends Dispatch
 
     public static function getUrl($slice = null): array|string
     {
-        $route = explode('/', $_SERVER['REDIRECT_URL']);
+        $url = $_SERVER['REDIRECT_URL'] ?? ($_SERVER['REQUEST_URI'] ?? '/');
+        $route = explode('/', $url);
 
         if ($slice !== null) {
             return $route[$slice] ?? '';
