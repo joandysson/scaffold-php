@@ -57,7 +57,8 @@ abstract class BaseModel extends Connection
     protected static function queryRaw(string $query, array $params = []): array|bool
     {
         try {
-            $stmt = parent::$conn->prepare($query);
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
             $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -76,9 +77,10 @@ abstract class BaseModel extends Connection
     protected static function save(string $query, array $params): mixed
     {
         try {
-            $stmt = parent::$conn->prepare($query);
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
             $stmt->execute($params);
-            return parent::$conn->lastInsertId();
+            return $conn->lastInsertId();
         } catch (PDOException $e) {
             \App\Config\Log\Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
@@ -91,7 +93,8 @@ abstract class BaseModel extends Connection
     protected static function execUpdate(string $query, array $params): int
     {
         try {
-            $stmt = parent::$conn->prepare($query);
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
             $stmt->execute($params);
             return $stmt->rowCount();
         } catch (PDOException $e) {
