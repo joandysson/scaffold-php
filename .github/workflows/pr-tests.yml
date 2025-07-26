@@ -13,7 +13,7 @@ jobs:
         with:
           php-version: '8.2'
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist
       - name: Run PHP CodeSniffer
         run: composer phpcs
 
@@ -25,7 +25,7 @@ jobs:
         with:
           php-version: '8.2'
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist
       - name: Run PHPStan
         run: composer phpstan
 
@@ -37,7 +37,7 @@ jobs:
         with:
           php-version: '8.2'
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist
       - name: Audit dependencies
         run: composer audit
 
@@ -49,6 +49,6 @@ jobs:
         with:
           php-version: '8.2'
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist
       - name: Run tests
         run: composer test

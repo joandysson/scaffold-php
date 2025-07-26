@@ -13,11 +13,10 @@ abstract class Connection
     /**
      * @var PDO $conn
      */
-    protected static PDO $conn;
+    protected static ?PDO $conn = null;
 
     public function __construct()
     {
-        self::connect();
     }
 
     /**
@@ -25,6 +24,10 @@ abstract class Connection
      */
     private static function connect(): void
     {
+        if (self::$conn !== null) {
+            return;
+        }
+
         try {
             $db = getenv();
             $options = [
@@ -47,17 +50,26 @@ abstract class Connection
         }
     }
 
+    protected static function getConnection(): PDO
+    {
+        if (self::$conn === null) {
+            self::connect();
+        }
+        return self::$conn;
+    }
+
     public static function insert(string $table, string $fields, string $data, array $arrayData): void
     {
-        self::$conn->beginTransaction();
+        $conn = self::getConnection();
+        $conn->beginTransaction();
         try {
             $sql = "INSERT into {$table} ({$fields}) VALUES ({$data});";
-            $stmt = self::$conn->prepare($sql);
+            $stmt = $conn->prepare($sql);
             $stmt->execute($arrayData);
 
-            self::$conn->commit();
+            $conn->commit();
         } catch (PDOException $e) {
-            self::$conn->rollBack();
+            $conn->rollBack();
             echo $e->getMessage();
         }
     }
