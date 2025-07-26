@@ -73,20 +73,21 @@ abstract class Dispatch
             $controller = self::$route['handler'];
             $method = self::$route['action'];
 
-            if (class_exists($controller)) {
-                $newController = new $controller();
-                if (method_exists($controller, $method)) {
-                    $params = make([$newController, $method], self::$route['data'] ?? []);
-                    $newController->$method(...$params);
-                    return true;
-                }
-
-                self::$error = self::METHOD_NOT_ALLOWED;
-                return false;
+            if (!class_exists($controller)) {
+                self::$error = self::BAD_REQUEST;
+                throw new \RuntimeException("Controller {$controller} not found");
             }
 
-            self::$error = self::BAD_REQUEST;
-            return false;
+            $newController = new $controller();
+
+            if (!method_exists($controller, $method)) {
+                self::$error = self::METHOD_NOT_ALLOWED;
+                throw new \RuntimeException("Method {$method} not found in {$controller}");
+            }
+
+            $params = make([$newController, $method], self::$route['data'] ?? []);
+            $newController->$method(...$params);
+            return true;
         }
 
         self::$error = self::NOT_FOUND;
