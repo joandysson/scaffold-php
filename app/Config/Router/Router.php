@@ -65,17 +65,15 @@ class Router extends Dispatch
         $routeDiff = array_values(array_diff(explode('/', parent::$patch), explode('/', $route)));
 
         $offset = parent::$group ? 1 : 0;
-
+        $params = [];
         foreach ($keys as $key) {
-            parent::$data[$key[1]] = $routeDiff[$offset] ?? null;
+            $params[$key[1]] = $routeDiff[$offset] ?? null;
             $offset++;
         }
 
-        parent::formSpoofing();
-
         $route = (!parent::$group ? $route : '/' . parent::$group . "{$route}");
 
-        $data = parent::$data;
+        $data = $params;
 
         $namespace = self::$namespace;
         $router = function () use ($method, $handler, $data, $route, $name, $namespace) {
@@ -88,9 +86,6 @@ class Router extends Dispatch
                 'data' => $data
             ];
         };
-        if (parent::$data) {
-            parent::$data = [];
-        }
 
         $route = preg_replace('~{([^}]*)}~', '([^/]+)', $route);
 
