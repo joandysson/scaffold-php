@@ -66,7 +66,21 @@ jobs:
         with:
           script: |
             const summary = JSON.parse(process.env.COVERAGE || '${{ steps.coverage.outputs.summary }}');
-            const body = `### Coverage Report\nTotal coverage: ${summary.total}%\nChanged code coverage: ${summary.changed}%`;
+
+            const total = summary.total ?? 'N/A';
+            const changed = summary.changed ?? 'N/A';
+
+            const body = `
+            ## ✅ Code Coverage Report
+
+            | Type               | Coverage |
+            |--------------------|----------|
+            | 🟩 **Total**        | \`${total}%\` |
+            | 🟨 **Changed files**| \`${changed}%\` |
+
+            <sub>🧪 Coverage data generated automatically from \`coverage.xml\`</sub>
+            `;
+
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
