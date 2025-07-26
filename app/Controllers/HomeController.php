@@ -11,8 +11,11 @@ class HomeController
     {
             echo "Welcome to the Home Page!\n";
 
-            // view('home', [
-            //     'data' => $data
-            // ]);
+            // (new \App\Config\Response\Response())->view(
+            //     'home',
+            //     [
+            //         'data' => \$data
+            //     ]
+            // );
     }
 }
