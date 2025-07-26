@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php"
-         colors="true"
+         cacheDirectory=".phpunit.cache"
          failOnWarning="true"
          failOnRisky="true"
-         processUncoveredFiles="true"
-         cacheResult="true"
-         cacheDirectory=".phpunit.cache">
+         colors="true">
 
     <testsuites>
-        <testsuite name="Application Test Suite">
+        <testsuite name="Default">
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
 
     <coverage>
-        <directories>
+        <include>
             <directory suffix=".php">app</directory>
-        </directories>
-        <report>
-            <clover outputFile="coverage.xml"/>
-        </report>
+        </include>
+        <clover outputFile="coverage.xml"/>
     </coverage>
-
-    <logging>
-        <log type="coverage-clover" target="coverage.xml"/>
-    </logging>
 </phpunit>
