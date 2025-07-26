@@ -9,6 +9,8 @@ class HomeController
 {
     public function home(Request $request): void
     {
+        xdebug_break();
+        xdebug_info(); exit;
             echo "Welcome to the Home Page!\n";
 
             // (new \App\Config\Response\Response())->view(
