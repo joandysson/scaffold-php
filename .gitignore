@@ -2,3 +2,6 @@
 /node_modules/
 /vendor/
 .env
+.idea
+quiz_position.json
+newsletter_position_file.json

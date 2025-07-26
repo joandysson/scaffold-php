@@ -3,12 +3,14 @@
 namespace App\Config\Model;
 
 use App\Config\Database\Connection;
+use PDO;
+use PDOException;
 
 /**
  * class BaseModel
  * @package App\Config\Model
  */
-class BaseModel extends Connection
+abstract class BaseModel extends Connection
 {
     /**
      * @var string $groupBy
@@ -30,7 +32,7 @@ class BaseModel extends Connection
      */
     public string $order = 'DESC';
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
     }
@@ -49,16 +51,17 @@ class BaseModel extends Connection
     /**
      * @param string $query
      * @param array $params
-     * @return array
+     * @return array|bool
      */
-    protected static function queryRaw(string $query, array $params = []): array
+    protected static function queryRaw(string $query, array $params = []): array|bool
     {
         try {
             $stmt = parent::$conn->prepare($query);
             $stmt->execute($params);
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
             echo $e->getMessage();
+            return false;
         }
     }
 
@@ -69,13 +72,26 @@ class BaseModel extends Connection
      * @param array $params
      * @return int|bool
      */
-    protected static function save(string $query, array $params): int|bool
+    protected static function save(string $query, array $params): mixed
     {
         try {
             $stmt = parent::$conn->prepare($query);
             $stmt->execute($params);
             return parent::$conn->lastInsertId();
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
+            dd($e->getMessage());
+            // echo ;
+            return false;
+        }
+    }
+
+    protected static function execUpdate(string $query, array $params): int
+    {
+        try {
+            $stmt = parent::$conn->prepare($query);
+            $stmt->execute($params);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
             echo $e->getMessage();
             return false;
         }
@@ -88,12 +104,35 @@ class BaseModel extends Connection
      */
     protected static function prepareQueryCreate(array &$data, string $table): string
     {
-        $dataPDO = self::gerateArrayDataPDO($data);
+        $dataPDO = self::generateArrayDataPDO($data);
         $dataParams = implode(',', array_keys($data));
         $dataValues = implode(',', array_keys($dataPDO));
         $data = $dataPDO;
 
-        return  "INSERT INTO {$table} ($dataParams) VALUES ($dataValues)";
+        return "INSERT INTO {$table} ($dataParams) VALUES ($dataValues)";
+    }
+
+
+    /**
+     * @param array $data
+     * @param string $table
+     * @return string
+     */
+    protected static function prepareQueryReplace(array &$data, string $table): string
+    {
+        $dataPDO = self::generateArrayDataPDO($data);
+        $dataValues = [];
+        foreach ($dataPDO as $key => $value) {
+            $value = $key;
+            $key = str_replace(':', '', $key);
+            $dataValues[] = "{$key} = {$value}";
+        }
+
+        $dataValues = implode(', ', $dataValues);
+
+        $data = $dataPDO;
+
+        return "REPLACE INTO {$table} SET $dataValues";
     }
 
     /**
@@ -104,7 +143,7 @@ class BaseModel extends Connection
      */
     protected static function prepareQueryUpdate(array &$data, int $id, string $table): string
     {
-        $dataPDO = self::gerateArrayDataPDO($data);
+        $dataPDO = self::generateArrayDataPDO($data);
 
         $values = array_combine(array_keys($data), array_keys($dataPDO));
         $queryValues = '';
@@ -133,12 +172,37 @@ class BaseModel extends Connection
      * @param array $data
      * @return array
      */
-    private static  function gerateArrayDataPDO(array $data): array
+    private static function generateArrayDataPDO(array $data): array
     {
-        foreach ($data  as $key => $value) {
+        foreach ($data as $key => $value) {
             $dataPDO[":$key"] = $value;
         }
 
-        return $dataPDO;
+        return $dataPDO ?? [];
+    }
+
+    protected static function prepareQueryCreateBulk(array &$data, string $table): string
+    {
+        $dataParams = implode(',', array_keys($data[0]));
+        $dataValues = [];
+        $newData = [];
+
+        foreach ($data as $key => $value) {
+            $dataPDO = self::generateArrayDataPDO($value);
+
+            $newDataPDO = [];
+            foreach ($dataPDO as $key2 => $value2) {
+                $newDataPDO[$key2 . $key + 1] = $value2;
+            }
+
+            $dataValues[] = '(' . implode(',', array_keys($newDataPDO)) . ')';
+
+            $newData = [...$newData, ...$newDataPDO];
+        }
+
+        $data = $newData;
+        $dataValues = implode(',', $dataValues);
+
+        return "INSERT INTO {$table} ($dataParams) VALUES {$dataValues}";
     }
 }

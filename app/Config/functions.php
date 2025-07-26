@@ -5,15 +5,6 @@ CONST LANG_EN = 'en';
 CONST LANG_FR = 'fr';
 CONST LANG_ES = 'es';
 
-
-/**
- * @return bool
- */
-function isMobileDevice(): bool
-{
-    return preg_match("/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
-}
-
 /**
  * @param string $view
  * @param array $data
@@ -23,19 +14,35 @@ function isMobileDevice(): bool
 function view(string $view, array $data = [], bool $isMail = false): mixed
 {
     extract($data);
+    $fileDir = 'public' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
 
-    $filename = $isMail ? "public" . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR . "email" . DIRECTORY_SEPARATOR . $view . ".php" : "public" . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR . $view . ".php";
+    $filePath = $fileDir . $view . '.php';
 
-    if (!is_file($filename)) {
+    if (!is_file($filePath)) {
         exit('view not found');
     }
 
     ob_start();
-    include $filename;
-
-    if ($isMail) return ob_get_clean();
+    include $filePath;
 
     exit(ob_get_clean());
+}
+
+function emailView(string $view, array $data = []): mixed
+{
+    extract($data);
+    $fileDir = 'public' . DIRECTORY_SEPARATOR . 'email' . DIRECTORY_SEPARATOR;
+
+    $filePath = $fileDir . $view . '.php';
+
+    if (!is_file($filePath)) {
+        exit('view not found');
+    }
+
+    ob_start();
+    include $filePath;
+
+    return ob_get_clean();
 }
 
 /**
@@ -47,11 +54,7 @@ function asset(string $file): string
     return getenv('APP_URL') . '/' . "public" . '/' . "assets" . '/' . "{$file}";
 }
 
-/**
- * @param mixed $data
- * @return void
- */
-function dd(mixed $data): void
+function dd(mixed $data)
 {
     echo '<pre>', var_dump($data);
     die;
@@ -91,49 +94,87 @@ function errorReporting(bool $enable): void
 
 function getTextLang(): array
 {
-    $data = file_get_contents('public' . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . prefixLang() . '.json');
+    $data = file_get_contents(
+        'public' . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . getPrefixLang() . '.json'
+    );
 
-    return json_decode($data, true);
+    return json_decode($data, true) ?? [];
 }
 
 function getPrefixLang(): string
 {
     $prefixLang = prefixLang();
 
-    if(empty($prefixLang) || $prefixLang === LANG_PT || !in_array($prefixLang, langs())) {
+    if(empty($prefixLang) || $prefixLang === LANG_PT || !in_array($prefixLang, languages())) {
         return LANG_PT;
     }
 
     return $prefixLang;
 }
 
-function prefixLang() {
+function prefixLang(): string
+{
     $data = explode('/', $_SERVER['REDIRECT_URL']);
     return $data[1];
 }
 
-function getUri(string $uri)
+function getUri(string $uri): string
 {
    return '/' . getPrefixLang() . ($uri === '/' ? '': $uri);
 }
 
-function isMultiLanguage(): true
-{
-    return true;
-}
-
 function changeLang(string $lang): string
 {
+    $langPrefix = array_map(fn ($value) => '/'.$value, languages());
     return match ($lang) {
-        LANG_PT => str_replace(langs(), LANG_PT, $_SERVER['REQUEST_URI']),
-        LANG_EN => str_replace(langs(), LANG_EN, $_SERVER['REQUEST_URI']),
-        LANG_FR => str_replace(langs(), LANG_FR, $_SERVER['REQUEST_URI']),
-        LANG_ES => str_replace(langs(), LANG_ES, $_SERVER['REQUEST_URI']),
+        LANG_PT => str_replace($langPrefix, '/' . LANG_PT, $_SERVER['REQUEST_URI']),
+        LANG_EN => str_replace($langPrefix, '/' . LANG_EN, $_SERVER['REQUEST_URI']),
+        LANG_FR => str_replace($langPrefix, '/' . LANG_FR, $_SERVER['REQUEST_URI']),
+        LANG_ES => str_replace($langPrefix, '/' . LANG_ES, $_SERVER['REQUEST_URI']),
         default => '/' . LANG_PT
     };
 }
 
-function langs(): array
+function languages(): array
 {
     return [LANG_EN, LANG_PT, LANG_FR, LANG_ES, LANG_ES];
+}
+
+function __(string $text): string
+{
+    $texts = getTextLang();
+
+    return $texts[$text] ?? $text;
+}
+
+function getHtmlLang(): string
+{
+    return match (getPrefixLang()) {
+        LANG_EN => 'en-US',
+        LANG_FR => 'fr-FR',
+        LANG_ES => 'es-ES',
+        default => 'pt-BR'
+    };
+}
+
+function intlFormatDate(string $date): string
+{
+    $date = date_create($date);
+        // str_replace('-','_', getHtmlLang())
+    $fmt = new IntlDateFormatter(
+        'pt_br',
+        IntlDateFormatter::LONG,
+        IntlDateFormatter::NONE
+    );
+
+    return $fmt->format($date);
+
+}
+
+function section(Closure $fun) {
+    ob_start();
+
+    $fun();
+
+    return ob_get_clean();
 }

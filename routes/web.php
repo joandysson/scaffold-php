@@ -2,24 +2,13 @@
 
 use App\Config\Router\Router;
 
+// Router::prefix('/api/v1');
 
-// Router::get('/{id}', 'HomeController:home', 'home');
-// Router::prefix('/api');
-// Router::put('/', 'HomeController:index');
-// Router::post('/', 'HomeController:index');
-// Router::delete('/', 'HomeController:index');
-// Router::patch('/', 'HomeController:index');
-// Router::get('/', function() {
-//     view('my-view');
-// });
-// Router::get('/', function() {
-//     Router::redirect('/test');
-// });
-
-Router::get('/', 'HomeController:index');
+Router::get('/', 'HomeController:home');
 
 Router::run();
 
 if (Router::error()) {
+    http_response_code(404);
     view('404');
 }

@@ -2,16 +2,16 @@
 
 namespace App\Controllers;
 
+use App\Service\PostService;
+
 class HomeController
 {
-    public function __construct() {
-    }
-
-    /**
-     * @return void
-     */
-    public function index(): never
+    public function home(): void
     {
-        view('home');
+            echo "Welcome to the Home Page!\n";
+
+            // view('home', [
+            //     'data' => $data
+            // ]);
     }
 }

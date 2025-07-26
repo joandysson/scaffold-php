@@ -1,17 +1,18 @@
 <?php
+
 namespace App\Config\Router;
 
 class URL
 {
-    private static $url = array();
-    public static $labelPages = [];
+    private static array $url = [];
+    public static array $labelPages = [];
 
     public static function getLabelPage($url)
     {
         return self::$labelPages[$url];
     }
 
-    public static function get($positions)
+    public static function get($positions): string
     {
         static::checkURL();
         $positions = func_get_args();
@@ -31,7 +32,7 @@ class URL
         return implode('/', $urlReturn);
     }
 
-    private static function checkURL()
+    private static function checkURL(): void
     {
         if (count(static::$url)) {
             return;

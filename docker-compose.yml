@@ -5,19 +5,20 @@ services:
         container_name: mariadb
         restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: 12345678
-            MYSQL_DATABASE: shorturl
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_NAME}
         ports:
             - "3306:3306"
         volumes:
             - ./docker/db:/docker-entrypoint-initdb.d
-            - database:/var/lib/mysql'
+            - englishtips_db:/var/lib/mysql'
     app:
         build: .
         restart: always
         container_name: app
         volumes:
             - .:/var/www/html
+            - ./docker/config/php.ini:/usr/local/etc/php/php.ini
         depends_on:
             - db
         ports:
@@ -38,6 +39,6 @@ services:
         ports:
             - 8080:8080
 volumes:
-    database:
+    englishtips_db:
 networks:
     default:
