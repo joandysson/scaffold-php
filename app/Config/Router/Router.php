@@ -3,6 +3,7 @@
 namespace App\Config\Router;
 
 use Closure;
+use App\Config\Response\HttpStatus;
 
 class Router extends Dispatch
 {
@@ -65,17 +66,15 @@ class Router extends Dispatch
         $routeDiff = array_values(array_diff(explode('/', parent::$patch), explode('/', $route)));
 
         $offset = parent::$group ? 1 : 0;
-
+        $params = [];
         foreach ($keys as $key) {
-            parent::$data[$key[1]] = $routeDiff[$offset] ?? null;
+            $params[$key[1]] = $routeDiff[$offset] ?? null;
             $offset++;
         }
 
-        parent::formSpoofing();
-
         $route = (!parent::$group ? $route : '/' . parent::$group . "{$route}");
 
-        $data = parent::$data;
+        $data = $params;
 
         $namespace = self::$namespace;
         $router = function () use ($method, $handler, $data, $route, $name, $namespace) {
@@ -88,9 +87,6 @@ class Router extends Dispatch
                 'data' => $data
             ];
         };
-        if (parent::$data) {
-            parent::$data = [];
-        }
 
         $route = preg_replace('~{([^}]*)}~', '([^/]+)', $route);
 
@@ -123,9 +119,14 @@ class Router extends Dispatch
         return null;
     }
 
-    public static function redirect(string $route, $data = null, $status = 301): void
+    public static function redirect(
+        string $route,
+        $data = null,
+        int|HttpStatus $status = HttpStatus::MOVED_PERMANENTLY
+    ): void
     {
-        http_response_code($status);
+        $code = $status instanceof HttpStatus ? $status->value : $status;
+        http_response_code($code);
 
         if ($name = self::route($route, $data)) {
             header("Location: {$name}");

@@ -178,3 +178,33 @@ function section(Closure $fun) {
 
     return ob_get_clean();
 }
+
+/**
+ * Resolve and instantiate class dependencies for a callable.
+ */
+function make(callable $callable, array $routeParams = []): array
+{
+    $parameters = [];
+
+    if (is_array($callable)) {
+        $ref = new \ReflectionMethod($callable[0], $callable[1]);
+    } else {
+        $ref = new \ReflectionFunction($callable);
+    }
+
+    foreach ($ref->getParameters() as $param) {
+        $type = $param->getType();
+        if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+            $className = $type->getName();
+            if (class_exists($className)) {
+                $object = new $className();
+                if ($object instanceof \App\Config\Request\Request) {
+                    $object->setRouteParams($routeParams);
+                }
+                $parameters[] = $object;
+            }
+        }
+    }
+
+    return $parameters;
+}
