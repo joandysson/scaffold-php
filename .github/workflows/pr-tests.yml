@@ -1,11 +1,11 @@
-name: Run Tests
+name: CI Pipeline
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  phpunit:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,5 +16,9 @@ jobs:
         run: composer install --no-interaction --prefer-dist
       - name: Run PHP CodeSniffer
         run: composer phpcs
+      - name: Run PHPStan
+        run: composer phpstan
+      - name: Audit dependencies
+        run: composer audit
       - name: Run tests
         run: composer test

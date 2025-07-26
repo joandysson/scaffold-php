@@ -55,4 +55,6 @@ docker/     Imagens e configurações do Docker
 
 - `composer test` executa a suite de testes.
 - `composer phpcs` roda o linter do código.
+- `composer phpstan` executa a análise estática.
+- `composer audit` verifica vulnerabilidades nas dependências.
 - `make cron name=ExempleCron` executa uma tarefa agendada de exemplo.
