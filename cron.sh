@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script is used to run cron jobs for the URL shortener tool.
+# This script is used to run cron jobs.
 # Example usage: sh cron.sh CreatePostTitle DEV
 # File needs to be executable: chmod +x cron.sh and LF
 
