@@ -6,11 +6,11 @@ import subprocess
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: coverage_summary.py <coverage.xml> <base_ref>", file=sys.stderr)
+        print("Usage: coverage_summary.py <coverage.xml> <base_sha>", file=sys.stderr)
         sys.exit(1)
 
     cov_file = sys.argv[1]
-    base_ref = sys.argv[2]
+    base_sha = sys.argv[2]
 
     tree = ET.parse(cov_file)
     root = tree.getroot()
@@ -21,7 +21,7 @@ def main():
     covered_statements = int(metrics.get('coveredstatements', 0))
     total = round(100 * covered_statements / total_statements, 2) if total_statements else 0.0
 
-    changed_files = subprocess.check_output(['git', 'diff', '--name-only', base_ref]).decode().splitlines()
+    changed_files = subprocess.check_output(['git', 'diff', '--name-only', base_sha]).decode().splitlines()
     changed_files = [os.path.abspath(f) for f in changed_files if f.endswith('.php')]
 
     changed_total = 0

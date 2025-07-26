@@ -51,11 +51,11 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
       - name: Run tests with coverage
-        run: phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml
+        run: phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml tests
       - name: Calculate coverage summary
         id: coverage
         run: |
-          python .github/scripts/coverage_summary.py coverage.xml origin/${{ github.base_ref }} > summary.json
+          python .github/scripts/coverage_summary.py coverage.xml ${{ github.event.pull_request.base.sha }} > summary.json
           cat summary.json
           echo "summary=$(cat summary.json)" >> "$GITHUB_OUTPUT"
       - name: Comment coverage on PR
