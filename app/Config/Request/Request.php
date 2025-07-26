@@ -29,7 +29,9 @@ class Request
     private function parseBody(?string $rawInput = null): array
     {
         if (in_array($this->method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            $contentType = $this->headers['Content-Type'] ?? $this->headers['content-type'] ?? '';
+            $contentType = $this->headers['Content-Type']
+                ?? $this->headers['content-type']
+                ?? ($_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? ''));
             if (str_contains($contentType, 'application/json')) {
                 $raw = $rawInput ?? file_get_contents('php://input');
                 $data = json_decode($raw, true);
