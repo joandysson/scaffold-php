@@ -8,6 +8,10 @@ use App\Config\Response\HttpStatus;
 
 class Router extends Dispatch
 {
+    /**
+     * Base namespace for controllers. Defaults to 'App\Controllers'.
+     * Can be changed using setNamespace().
+     */
     private static string $namespace = 'App\Controllers';
 
     private static string $prefix = '';
@@ -26,6 +30,22 @@ class Router extends Dispatch
     public static function prefix(string $prefix = ''): void
     {
         self::$prefix = $prefix;
+    }
+
+    /**
+     * Change the namespace used to resolve controller classes.
+     */
+    public static function setNamespace(string $namespace): void
+    {
+        self::$namespace = trim($namespace, '\\');
+    }
+
+    /**
+     * Get the current controller namespace.
+     */
+    public static function getNamespace(): string
+    {
+        return self::$namespace;
     }
 
     public static function post($route, $handler, $name = null): void
