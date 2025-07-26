@@ -88,4 +88,9 @@ class Request
     {
         return $this->body[$key] ?? $this->query[$key] ?? $default;
     }
+
+    public function validate(array $rules): array
+    {
+        return \App\Config\Validation\Validator::validate($this->body, $rules);
+    }
 }

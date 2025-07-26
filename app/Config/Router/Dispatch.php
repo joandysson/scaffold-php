@@ -13,6 +13,7 @@ abstract class Dispatch
     protected static string $separator;
     protected static ?string $group = null;
     protected static ?int $error = null;
+    protected static array $middlewares = [];
 
     public const BAD_REQUEST = \App\Config\Response\HttpStatus::BAD_REQUEST->value;
     public const NOT_FOUND = \App\Config\Response\HttpStatus::NOT_FOUND->value;
@@ -41,6 +42,11 @@ abstract class Dispatch
         return self::$error;
     }
 
+    public static function addMiddleware(callable $middleware): void
+    {
+        self::$middlewares[] = $middleware;
+    }
+
     public static function run(): bool
     {
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -66,6 +72,20 @@ abstract class Dispatch
         if (self::$route) {
             if (is_callable(self::$route['handler'])) {
                 $params = make(self::$route['handler'], self::$route['data'] ?? []);
+                $request = null;
+                foreach ($params as $p) {
+                    if ($p instanceof \App\Config\Request\Request) {
+                        $request = $p;
+                        break;
+                    }
+                }
+                if ($request === null) {
+                    $request = new \App\Config\Request\Request();
+                    $request->setRouteParams(self::$route['data'] ?? []);
+                }
+                foreach (self::$middlewares as $middleware) {
+                    $middleware($request);
+                }
                 call_user_func_array(self::$route['handler'], $params);
                 return true;
             }
@@ -86,6 +106,20 @@ abstract class Dispatch
             }
 
             $params = make([$newController, $method], self::$route['data'] ?? []);
+            $request = null;
+            foreach ($params as $p) {
+                if ($p instanceof \App\Config\Request\Request) {
+                    $request = $p;
+                    break;
+                }
+            }
+            if ($request === null) {
+                $request = new \App\Config\Request\Request();
+                $request->setRouteParams(self::$route['data'] ?? []);
+            }
+            foreach (self::$middlewares as $middleware) {
+                $middleware($request);
+            }
             $newController->$method(...$params);
             return true;
         }

@@ -118,3 +118,65 @@ Os testes ficam na pasta `tests/` e utilizam PHPUnit. Para criar novos testes de
 rotas é possível simular requisições definindo variáveis `$_SERVER` e chamando
 `Router::run()`, como demonstrado em `RouterInjectionTest.php`. Serviços podem
 ser mockados normalmente através das ferramentas do PHPUnit.
+
+### Exemplos avançados
+
+#### Controllers e middleware
+
+```php
+use App\Config\Router\Router;
+
+// Middleware simples
+Router::addMiddleware(function ($request) {
+    // verificar autenticação, registrar logs, etc
+});
+
+// Controller com validação
+Router::post('/users', function (App\Config\Request\Request $req) {
+    $errors = $req->validate([
+        'email' => 'required|email',
+        'name' => 'required'
+    ]);
+    if ($errors) {
+        return (new App\Config\Response\Response())->json(['errors' => $errors], App\Config\Response\HttpStatus::BAD_REQUEST);
+    }
+    echo 'Usuário criado';
+});
+```
+
+#### Tarefas de cron personalizadas
+
+Crie classes que implementem `App\Cron\CronInterface` e registre-as em `app/Config/cron.php`:
+
+```php
+class CleanupCron implements App\Cron\CronInterface
+{
+    public function run(): void
+    {
+        // lógica da tarefa
+    }
+}
+```
+
+```php
+return [
+    'cleanup' => CleanupCron::class,
+];
+```
+
+Execute `php run-cron.php cleanup` para rodar manualmente.
+
+#### Operações de banco de dados
+
+Modelos podem estender `BaseModel` para usar métodos auxiliares de query:
+
+```php
+class User extends App\Config\Model\BaseModel
+{
+    public function create(array $data): int|bool
+    {
+        $sql = self::prepareQueryCreate($data, 'users');
+        return self::save($sql, $data);
+    }
+}
+```
