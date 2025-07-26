@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Config\Container;
 
 use Closure;
+use ReflectionClass;
+use ReflectionNamedType;
 
 class Container
 {
@@ -39,7 +41,7 @@ class Container
 
     private static function build(string $class): object
     {
-        $ref = new \ReflectionClass($class);
+        $ref = new ReflectionClass($class);
         $constructor = $ref->getConstructor();
 
         if ($constructor === null) {
@@ -49,7 +51,7 @@ class Container
         $params = [];
         foreach ($constructor->getParameters() as $param) {
             $type = $param->getType();
-            if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
                 $params[] = self::get($type->getName());
             } elseif ($param->isDefaultValueAvailable()) {
                 $params[] = $param->getDefaultValue();

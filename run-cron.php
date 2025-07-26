@@ -4,11 +4,12 @@ declare(strict_types=1);
 use App\Cron\CronInterface as CronCronInterface;
 use App\Cron\CronRunner;
 use App\Cron\ExampleCron;
+use Dotenv\Dotenv;
 
 require_once 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
 
-$dotenv = Dotenv\Dotenv::createUnsafeImmutable('.');
+$dotenv = Dotenv::createUnsafeImmutable('.');
 $dotenv->load();
 
 $runner = new CronRunner();

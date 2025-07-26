@@ -5,6 +5,7 @@ namespace App\Config\Database;
 
 use PDO;
 use PDOException;
+use App\Config\Log\Log;
 /**
  * class Connection
  */
@@ -46,7 +47,7 @@ abstract class Connection
 
             self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            \App\Config\Log\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
@@ -73,7 +74,7 @@ abstract class Connection
             $conn->commit();
         } catch (PDOException $e) {
             $conn->rollBack();
-            \App\Config\Log\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }

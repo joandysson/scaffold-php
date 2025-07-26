@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Config\Request;
 
+use App\Config\Validation\Validator;
+
 class Request
 {
     private string $method;
@@ -91,6 +93,6 @@ class Request
 
     public function validate(array $rules): array
     {
-        return \App\Config\Validation\Validator::validate($this->body, $rules);
+        return Validator::validate($this->body, $rules);
     }
 }

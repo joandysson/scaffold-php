@@ -2,6 +2,8 @@
 
 use App\Config\Router\Router;
 use App\Config\Request\Request;
+use App\Config\Response\Response;
+use App\Config\Response\HttpStatus;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -40,9 +42,9 @@ Router::get('/contact', 'HomeController:contact', 'contact.page');
 Router::run();
 
 if (Router::error()) {
-    (new \App\Config\Response\Response())->view(
+    (new Response())->view(
         '404',
         [],
-        \App\Config\Response\HttpStatus::NOT_FOUND
+        HttpStatus::NOT_FOUND
     );
 }

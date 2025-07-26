@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Config\Model;
 
 use App\Config\Database\Connection;
+use App\Config\Log\Log;
 use PDO;
 use PDOException;
 
@@ -62,7 +63,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            \App\Config\Log\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
@@ -85,7 +86,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $conn->lastInsertId();
         } catch (PDOException $e) {
-            \App\Config\Log\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
@@ -101,7 +102,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $stmt->rowCount();
         } catch (PDOException $e) {
-            \App\Config\Log\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }

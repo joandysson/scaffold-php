@@ -2,8 +2,9 @@
 require_once __DIR__ . '/../app/Config/functions.php';
 
 use PHPUnit\Framework\TestCase;
+use App\Config\Model\BaseModel;
 
-class TestModel extends \App\Config\Model\BaseModel
+class TestModel extends BaseModel
 {
     public static function callPrepareCreate(array &$data, string $table): string
     {
