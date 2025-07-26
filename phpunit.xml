@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php"
          colors="true"
-         verbose="true"
          failOnWarning="true"
          failOnRisky="true"
-         executionOrder="depends,defects"
+         processUncoveredFiles="true"
          cacheResult="true"
          cacheDirectory=".phpunit.cache">
 
@@ -14,20 +13,14 @@
         </testsuite>
     </testsuites>
 
-    <coverage processUncoveredFiles="true">
-        <include>
+    <coverage>
+        <directories>
             <directory suffix=".php">app</directory>
-        </include>
+        </directories>
         <report>
             <clover outputFile="coverage.xml"/>
         </report>
     </coverage>
-
-    <filter>
-        <whitelist>
-            <directory suffix=".php">app</directory>
-        </whitelist>
-    </filter>
 
     <logging>
         <log type="coverage-clover" target="coverage.xml"/>
