@@ -14,6 +14,9 @@ Este projeto fornece uma estrutura inicial simples em PHP para aplicações que 
 - MySQL `10`
 - Adminer para gerência do banco de dados
 
+O `BaseModel` usa uma conexão com o banco de dados que é aberta apenas quando
+necessária, evitando conexões antecipadas.
+
 ### Portas dos containers
 
 |Container|Porta|
@@ -25,6 +28,25 @@ Este projeto fornece uma estrutura inicial simples em PHP para aplicações que 
 #### Configurações de ambiente
 
 As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. Entre elas, `APP_DEBUG` controla a exibição de erros e `LOG_DRIVER` define o tipo de logger utilizado (`file` ou `error_log`).
+
+#### Exemplo de roteamento
+
+O roteador oferece uma sintaxe simples para registrar rotas. No arquivo `routes/web.php` você pode declarar rotas apontando para controladores ou funções anônimas:
+
+```php
+use App\Config\Router\Router;
+
+Router::get('/', 'HomeController:home');
+Router::get('/blog/{id}', 'HomeController:blog');
+
+// Agrupando rotas com um prefixo
+Router::prefix('/api');
+Router::get('/status', function () {
+    echo 'API ok';
+});
+```
+
+Para criar novos controladores basta adicioná-los em `app/Controllers` e registrar as rotas correspondentes. Os modelos ficam em `app/Models` e podem herdar de `BaseModel`.
 
 #### Rotas de exemplo
 
@@ -59,3 +81,15 @@ docker/     Imagens e configurações do Docker
 - `composer audit` verifica vulnerabilidades nas dependências.
 - `make cron name=ExempleCron` executa uma tarefa agendada de exemplo.
 - `make ci` roda todas as verificações e testes dentro do container.
+
+### Tarefas agendadas
+
+Tarefas de cron são registradas no arquivo `app/Config/cron.php`. Para executar
+uma delas manualmente utilize:
+
+```sh
+php run-cron.php NomeDaTarefa
+```
+
+O script `cron.sh` é um facilitador que pode ser utilizado em servidores para 
+agendar execuções recorrentes.
