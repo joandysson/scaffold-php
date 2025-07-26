@@ -1,13 +1,13 @@
 <?php
-// Exemplo de view utilizando o layout principal
-// Defina aqui o titulo e descricao da pagina
+// Example view using the main layout
+// Set the page title and description here
 $title = 'Home';
-$description = 'Pagina inicial de exemplo';
+$description = 'Sample home page';
 ?>
 <?php $content = section(function () { ?>
-    <h1>Exemplo</h1>
-    <p>Pagina simples para demonstrar o layout.</p>
+    <h1>Example</h1>
+    <p>Simple page to demonstrate the layout.</p>
 <?php }); ?>
 
-<?php // Inclui o template principal que usa os layouts de cabecalho e rodape ?>
+<?php // Include the main template which loads header and footer layouts ?>
 <?php include 'templates/main.php'; ?>

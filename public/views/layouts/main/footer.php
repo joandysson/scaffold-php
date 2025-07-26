@@ -1,4 +1,4 @@
 <footer>
-    <!-- Rodape de exemplo com ano dinamico -->
-    <p>&copy; <?= date('Y') ?> Exemplo</p>
+    <!-- Example footer with dynamic year -->
+    <p>&copy; <?= date('Y') ?> Example</p>
 </footer>

@@ -1,4 +1,4 @@
 <nav>
-    <!-- Menu de navegacao de exemplo -->
+    <!-- Example navigation menu -->
     <a href="/">Home</a>
 </nav>

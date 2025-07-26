@@ -1,10 +1,10 @@
 <?php
 // public/views/layouts/main/head.php
-// Meta tags e links globais do layout
+// Meta tags and global layout links
 ?>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= $title ?? 'Exemplo' ?></title>
+<title><?= $title ?? 'Example' ?></title>
 <meta name="description" content="<?= $description ?? '' ?>">
 
 <!-- Favicons -->
@@ -12,13 +12,13 @@
 <link rel="apple-touch-icon" href="<?= asset('images/icon/apple-touch-icon.png') ?>">
 
 <!-- Open Graph / Facebook -->
-<meta property="og:title" content="<?= $title ?? 'Exemplo' ?>">
+<meta property="og:title" content="<?= $title ?? 'Example' ?>">
 <meta property="og:description" content="<?= $description ?? '' ?>">
 <meta property="og:image" content="<?= asset('images/jpg/share.jpg') ?>">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<?= $title ?? 'Exemplo' ?>">
+<meta name="twitter:title" content="<?= $title ?? 'Example' ?>">
 <meta name="twitter:description" content="<?= $description ?? '' ?>">
 <meta name="twitter:image" content="<?= asset('images/jpg/share.jpg') ?>">
 

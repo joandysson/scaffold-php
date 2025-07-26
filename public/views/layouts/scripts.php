@@ -1,2 +1,2 @@
-<!-- Scripts globais -->
+<!-- Global scripts -->
 <script src="<?= asset('js/main.js') ?>"></script>

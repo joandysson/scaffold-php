@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 CONST LANG_PT = 'pt';
 CONST LANG_EN = 'en';
@@ -138,7 +139,7 @@ function changeLang(string $lang): string
 
 function languages(): array
 {
-    return [LANG_EN, LANG_PT, LANG_FR, LANG_ES, LANG_ES];
+    return [LANG_EN, LANG_PT, LANG_FR, LANG_ES];
 }
 
 function __(string $text): string
@@ -161,7 +162,6 @@ function getHtmlLang(): string
 function intlFormatDate(string $date): string
 {
     $date = date_create($date);
-        // str_replace('-','_', getHtmlLang())
     $fmt = new IntlDateFormatter(
         'pt_br',
         IntlDateFormatter::LONG,
