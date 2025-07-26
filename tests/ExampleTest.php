@@ -13,7 +13,7 @@ class ExampleTest extends TestCase
     }
     public function testLanguagesReturnExpectedList()
     {
-        $this->assertSame([LANG_EN, LANG_PT, LANG_FR, LANG_ES, LANG_ES], languages());
+        $this->assertSame([LANG_EN, LANG_PT, LANG_FR, LANG_ES], languages());
     }
 
 }

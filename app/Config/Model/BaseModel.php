@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Config\Model;
 
@@ -66,7 +67,7 @@ abstract class BaseModel extends Connection
     }
 
     /**
-     * Undocumented function
+     * Execute an INSERT query and return the inserted ID.
      *
      * @param string $query
      * @param array $params
@@ -80,7 +81,6 @@ abstract class BaseModel extends Connection
             return parent::$conn->lastInsertId();
         } catch (PDOException $e) {
             dd($e->getMessage());
-            // echo ;
             return false;
         }
     }

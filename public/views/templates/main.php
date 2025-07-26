@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="<?= getHtmlLang() ?>">
 <head>
-    <?php // Cabecalho global do site ?>
+    <?php // Global site header ?>
     <?php include dirname(__DIR__) . '/layouts/main/head.php'; ?>
-    <?php // Area para adicionar elementos extras ao <head> ?>
+    <?php // Area to add extra elements to <head> ?>
     <?php if (isset($headExtra)) { echo $headExtra; } ?>
 </head>
 <body>
-    <?php // Topo do site ?>
+    <?php // Site header ?>
     <?php include dirname(__DIR__) . '/layouts/main/header.php'; ?>
-    <?php // Conteudo principal renderizado pela view ?>
+    <?php // Main content rendered by the view ?>
     <?php echo $content; ?>
-    <?php // Rodape do site ?>
+    <?php // Site footer ?>
     <?php include dirname(__DIR__) . '/layouts/main/footer.php'; ?>
-    <?php // Scripts globais ?>
+    <?php // Global scripts ?>
     <?php include dirname(__DIR__) . '/layouts/scripts.php'; ?>
-    <?php // Permite injetar scripts extras se necessario ?>
+    <?php // Allows injecting extra scripts if needed ?>
     <?php if (isset($scriptsExtra)) { echo $scriptsExtra; } ?>
 </body>
 </html>
