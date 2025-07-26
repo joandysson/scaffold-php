@@ -3,6 +3,7 @@
 use App\Config\Router\Router;
 use function Sentry\captureException;
 use function Sentry\init;
+use App\Config\Log\Log;
 
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
@@ -29,7 +30,7 @@ try {
         captureException($exception);
     }
 
-    \App\Config\Log\Log::error($exception->getMessage());
+    Log::error($exception->getMessage());
     if (getenv('APP_DEBUG') === 'true') {
         echo $exception->getMessage();
     }

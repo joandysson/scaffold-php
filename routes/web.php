@@ -42,6 +42,11 @@ Router::get('/contact', 'HomeController:contact', 'contact.page');
 Router::run();
 
 if (Router::error()) {
+    ResponseFacade::view(
+        'errors.404',
+        ['message' => 'Page not found']
+    );
+
     ResponseFacade::json(
         ['error' => 'Not Found'],
         HttpStatus::NOT_FOUND

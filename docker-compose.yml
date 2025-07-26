@@ -18,11 +18,11 @@ services:
         container_name: app
         volumes:
             - .:/var/www/html
-            - ./docker/config/php.ini:/usr/local/etc/php/php.ini
         depends_on:
             - db
         ports:
             - "80:80"
+            - "9003:9003"
         environment:
             APP_URL: ${APP_URL}
             DB_DRIVER: ${DB_DRIVER}
@@ -30,6 +30,10 @@ services:
             DB_HOST: ${DB_HOST}
             DB_PASSWORD: ${DB_PASSWORD}
             DB_USER: ${DB_USER}
+            XDEBUG_MODE: ${XDEBUG_MODE}
+            XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST}
+            XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST}
+            XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT}
     adminer:
         image: adminer
         container_name: adminer

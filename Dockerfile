@@ -15,12 +15,11 @@ RUN pecl install mongodb && docker-php-ext-enable mongodb
 # Install Composer
 COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
 
-# Install and configure Xdebug
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
-    && echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    && XDEBUG_SO=$(find /usr/local/lib/php/extensions/ -name xdebug.so) \
+    && echo "zend_extension=$XDEBUG_SO" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
