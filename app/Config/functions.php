@@ -102,8 +102,9 @@ function getPrefixLang(): string
 
 function prefixLang(): string
 {
-    $data = explode('/', $_SERVER['REDIRECT_URL']);
-    return $data[1];
+    $url = $_SERVER['REDIRECT_URL'] ?? ($_SERVER['REQUEST_URI'] ?? '/');
+    $data = explode('/', $url);
+    return $data[1] ?? '';
 }
 
 function getUri(string $uri): string
