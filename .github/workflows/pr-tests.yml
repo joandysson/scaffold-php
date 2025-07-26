@@ -45,10 +45,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          coverage: xdebug
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
-      - name: Run tests
-        run: composer test
+      - name: Run tests with coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-filter=app tests
+      - name: Calculate coverage summary
+        id: coverage
+        run: |
+          python .github/scripts/coverage_summary.py coverage.xml ${{ github.event.pull_request.base.sha }} > summary.json
+          cat summary.json
+          echo "summary=$(cat summary.json)" >> "$GITHUB_OUTPUT"
+      - name: Comment coverage on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = JSON.parse(process.env.COVERAGE || '${{ steps.coverage.outputs.summary }}');
+
+            const total = summary.total ?? 'N/A';
+            const changed = summary.changed ?? 'N/A';
+
+            const body = `
+            ## ✅ Code Coverage Report
+
+            | Type               | Coverage |
+            |--------------------|----------|
+            | 🟩 **Total**        | \`${total}%\` |
+            | 🟨 **Changed files**| \`${changed}%\` |
+
+            <sub>🧪 Coverage data generated automatically from \`coverage.xml\`</sub>
+            `;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+        env:
+          COVERAGE: ${{ steps.coverage.outputs.summary }}
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
