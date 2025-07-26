@@ -1,5 +1,10 @@
 FROM php:8.2-apache
 
+ARG XDEBUG_MODE
+ARG XDEBUG_START_WITH_REQUEST
+ARG XDEBUG_CLIENT_HOST
+ARG XDEBUG_CLIENT_PORT
+
 # Install basic PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
@@ -12,14 +17,18 @@ RUN docker-php-ext-install intl zip
 # Install and enable MongoDB extension
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
-# Install Composer
-COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
-
-RUN pecl install xdebug \
+# Install and enable Redis extension
+RUN pecl install xdebug-3.4.5 \
     && docker-php-ext-enable xdebug \
     && XDEBUG_SO=$(find /usr/local/lib/php/extensions/ -name xdebug.so) \
-    && echo "zend_extension=$XDEBUG_SO" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    && echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.mode=$XDEBUG_MODE" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=$XDEBUG_START_WITH_REQUEST" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=$XDEBUG_CLIENT_HOST" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_port=$XDEBUG_CLIENT_PORT" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+# Install Composer
+COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
 
 # Enable Apache modules
 RUN a2enmod rewrite headers

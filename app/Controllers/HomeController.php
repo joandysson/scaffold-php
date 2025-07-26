@@ -9,14 +9,13 @@ class HomeController
 {
     public function home(Request $request): void
     {
-            echo "Welcome to the Home Page!\n";
-
-            // (new \App\Config\Response\Response())->view(
-            //     'home',
-            //     [
-            //         'data' => \$data
-            //     ]
-            // );
+        echo "Welcome to the Home Page!\n";
+        // (new \App\Config\Response\Response())->view(
+        //     'home',
+        //     [
+        //         'data' => \$data
+        //     ]
+        // );
     }
 
     public function blog(Request $request): void
