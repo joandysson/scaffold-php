@@ -42,7 +42,7 @@
         "phpcbf": [
             "./vendor/bin/phpcbf ./app"
         ],
-        "phpstan": "./vendor/bin/phpstan analyse -c phpstan.neon.dist"
+        "phpstan": "./vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
     },
     "config": {
         "allow-plugins": {
