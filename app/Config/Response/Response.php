@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Config\Response;
 
 use App\Config\Response\HttpStatus;
+use RuntimeException;
 
 class Response
 {
@@ -30,6 +31,28 @@ class Response
         $this->setStatus($status);
         $this->addHeader('Content-Type', 'application/json');
         echo json_encode($data);
+    }
+
+    public function view(
+        string $view,
+        array $data = [],
+        int|HttpStatus $status = HttpStatus::OK
+    ): void {
+        $this->setStatus($status);
+
+        extract($data);
+        $fileDir = 'public' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+
+        $filePath = $fileDir . $view . '.php';
+
+        if (!is_file($filePath)) {
+            throw new RuntimeException('view not found');
+        }
+
+        ob_start();
+        include $filePath;
+
+        echo ob_get_clean();
     }
 
     public function send(string $content, int|HttpStatus $status = HttpStatus::OK): void

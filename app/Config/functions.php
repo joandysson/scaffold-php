@@ -6,28 +6,6 @@ CONST LANG_EN = 'en';
 CONST LANG_FR = 'fr';
 CONST LANG_ES = 'es';
 
-/**
- * @param string $view
- * @param array $data
- * @param boolean $isMail
- * @return mixed
- */
-function view(string $view, array $data = [], bool $isMail = false): mixed
-{
-    extract($data);
-    $fileDir = 'public' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
-
-    $filePath = $fileDir . $view . '.php';
-
-    if (!is_file($filePath)) {
-        exit('view not found');
-    }
-
-    ob_start();
-    include $filePath;
-
-    exit(ob_get_clean());
-}
 
 function emailView(string $view, array $data = []): mixed
 {
@@ -37,7 +15,7 @@ function emailView(string $view, array $data = []): mixed
     $filePath = $fileDir . $view . '.php';
 
     if (!is_file($filePath)) {
-        exit('view not found');
+        throw new RuntimeException('view not found');
     }
 
     ob_start();

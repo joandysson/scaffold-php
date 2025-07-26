@@ -33,6 +33,9 @@ Router::get('/contact', 'HomeController:contact', 'contact.page');
 Router::run();
 
 if (Router::error()) {
-    http_response_code(404);
-    view('404');
+    (new \App\Config\Response\Response())->view(
+        '404',
+        [],
+        \App\Config\Response\HttpStatus::NOT_FOUND
+    );
 }
