@@ -17,8 +17,8 @@ class Request
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $this->path = explode('?', $_SERVER['REQUEST_URI'])[0] ?? '/';
         $this->headers = function_exists('getallheaders') ? (getallheaders() ?: []) : [];
-        $this->query = $_GET ?? [];
-        $this->files = $_FILES ?? [];
+        $this->query = $_GET;
+        $this->files = $_FILES;
         $this->body = $this->parseBody($rawInput);
     }
 
@@ -32,7 +32,7 @@ class Request
                 return is_array($data) ? $data : [];
             }
             if ($this->method === 'POST') {
-                return $_POST ?? [];
+                return $_POST;
             }
             $raw = $rawInput ?? file_get_contents('php://input');
             if ($raw !== '') {
