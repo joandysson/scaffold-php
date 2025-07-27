@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers {
+namespace App\Controller {
     use App\Config\Request\Request;
 
     class DummyInjectionController
@@ -18,7 +18,7 @@ namespace {
     use App\Config\Router\Router;
     use App\Config\Router\Dispatch;
     use App\Config\Request\Request;
-    use App\Controllers\DummyInjectionController;
+    use App\Controller\DummyInjectionController;
 
     class RouterInjectionTest extends TestCase
     {

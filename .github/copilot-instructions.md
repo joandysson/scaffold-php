@@ -24,7 +24,7 @@ storage/    Arquivos gerados pela aplicação
 tests/      Testes PHPUnit
 docker/     Imagens e configurações do Docker
 ```
-Controladores ficam em `app/Controllers`, modelos em `app/Models` e as rotas padrão em `routes/web.php`.
+Controladores ficam em `app/Controller`, modelos em `app/Model`, serviços em `app/Servive`, repositórios em `app/Repository` e as rotas padrão em `routes/web.php`.
 
 ## 5. Exemplo de uso
 - Copie `.env.exemple` para `.env` e ajuste as variáveis de ambiente.
