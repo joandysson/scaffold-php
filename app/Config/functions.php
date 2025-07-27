@@ -33,6 +33,14 @@ function asset(string $file): string
     return getenv('APP_URL') . '/' . "public" . '/' . "assets" . '/' . "{$file}";
 }
 
+/**
+ * Escape output for safe HTML rendering.
+ */
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
 function dd(mixed $data): void
 {
     if (getenv('APP_DEBUG') === 'true') {
