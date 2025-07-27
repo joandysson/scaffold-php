@@ -117,8 +117,13 @@ abstract class BaseModel extends Connection
      */
     protected static function prepareQueryCreate(array &$data, string $table): string
     {
+        $table = self::sanitizeIdentifier($table);
         $dataPDO = self::generateArrayDataPDO($data);
-        $dataParams = implode(',', array_keys($data));
+        $sanitizedParams = [];
+        foreach (array_keys($data) as $param) {
+            $sanitizedParams[] = self::sanitizeIdentifier($param);
+        }
+        $dataParams = implode(',', $sanitizedParams);
         $dataValues = implode(',', array_keys($dataPDO));
         $data = $dataPDO;
 
@@ -133,11 +138,13 @@ abstract class BaseModel extends Connection
      */
     protected static function prepareQueryReplace(array &$data, string $table): string
     {
+        $table = self::sanitizeIdentifier($table);
         $dataPDO = self::generateArrayDataPDO($data);
         $dataValues = [];
         foreach ($dataPDO as $key => $value) {
             $value = $key;
             $key = str_replace(':', '', $key);
+            $key = self::sanitizeIdentifier($key);
             $dataValues[] = "{$key} = {$value}";
         }
 
@@ -156,12 +163,14 @@ abstract class BaseModel extends Connection
      */
     protected static function prepareQueryUpdate(array &$data, int $id, string $table): string
     {
+        $table = self::sanitizeIdentifier($table);
         $dataPDO = self::generateArrayDataPDO($data);
 
         $values = array_combine(array_keys($data), array_keys($dataPDO));
         $queryValues = '';
         foreach ($values as $key => $value) {
-            $queryValues .= "$key = $value, ";
+            $sanitizedKey = self::sanitizeIdentifier($key);
+            $queryValues .= "$sanitizedKey = $value, ";
         }
 
         $queryValues = substr($queryValues, 0, -2);
@@ -177,6 +186,7 @@ abstract class BaseModel extends Connection
      */
     protected static function deleteById(string $table, int $id): void
     {
+        $table = self::sanitizeIdentifier($table);
         $sql = "DELETE FROM {$table} WHERE id = :id";
         self::save($sql, [':id' => $id]);
     }
@@ -188,7 +198,8 @@ abstract class BaseModel extends Connection
     private static function generateArrayDataPDO(array $data): array
     {
         foreach ($data as $key => $value) {
-            $dataPDO[":$key"] = $value;
+            $sanitizedKey = self::sanitizeIdentifier($key);
+            $dataPDO[":$sanitizedKey"] = $value;
         }
 
         return $dataPDO ?? [];
@@ -196,7 +207,12 @@ abstract class BaseModel extends Connection
 
     protected static function prepareQueryCreateBulk(array &$data, string $table): string
     {
-        $dataParams = implode(',', array_keys($data[0]));
+        $table = self::sanitizeIdentifier($table);
+        $sanitizedParams = [];
+        foreach (array_keys($data[0]) as $param) {
+            $sanitizedParams[] = self::sanitizeIdentifier($param);
+        }
+        $dataParams = implode(',', $sanitizedParams);
         $dataValues = [];
         $newData = [];
 
@@ -217,5 +233,17 @@ abstract class BaseModel extends Connection
         $dataValues = implode(',', $dataValues);
 
         return "INSERT INTO {$table} ($dataParams) VALUES {$dataValues}";
+    }
+
+    /**
+     * Sanitize a table or column identifier to contain only alphanumeric characters and underscores.
+     */
+    private static function sanitizeIdentifier(string $identifier): string
+    {
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $identifier)) {
+            throw new \InvalidArgumentException('Invalid identifier');
+        }
+
+        return $identifier;
     }
 }
