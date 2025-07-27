@@ -167,7 +167,19 @@ class Router extends Dispatch
 
     public static function redirectBack(): void
     {
-        header("Location: {$_SERVER['HTTP_REFERER']}");
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
+        $host = $_SERVER['HTTP_HOST'] ?? parse_url(parent::$projectUrl ?? getenv('APP_URL') ?: '', PHP_URL_HOST);
+
+        if ($referer && filter_var($referer, FILTER_VALIDATE_URL)) {
+            $refererHost = parse_url($referer, PHP_URL_HOST);
+
+            if ($refererHost === $host) {
+                header("Location: {$referer}");
+                exit;
+            }
+        }
+
+        header('Location: /');
         exit;
     }
 
