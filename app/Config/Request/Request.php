@@ -16,7 +16,7 @@ class Request
     private array $headers;
     private array $routeParams = [];
 
-    public function __construct(?string $rawInput = null)
+    public function __construct(string $rawInput = '')
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $this->path = explode('?', $_SERVER['REQUEST_URI'])[0] ?? '/';
@@ -26,26 +26,32 @@ class Request
         $this->body = $this->parseBody($rawInput);
     }
 
-    private function parseBody(?string $rawInput = null): array
+    private function parseBody(string $rawInput = ''): array
     {
+        $input = $rawInput !== '' ? $rawInput : null;
+
         if (in_array($this->method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
             $contentType = $this->headers['Content-Type']
                 ?? $this->headers['content-type']
                 ?? ($_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? ''));
+
             if (str_contains($contentType, 'application/json')) {
-                $raw = $rawInput ?? file_get_contents('php://input');
+                $raw = $input ?? file_get_contents('php://input');
                 $data = json_decode($raw, true);
                 return is_array($data) ? $data : [];
             }
+
             if ($this->method === 'POST') {
                 return $_POST;
             }
-            $raw = $rawInput ?? file_get_contents('php://input');
+
+            $raw = $input ?? file_get_contents('php://input');
             if ($raw !== '') {
                 parse_str($raw, $data);
                 return $data;
             }
         }
+
         return [];
     }
 
