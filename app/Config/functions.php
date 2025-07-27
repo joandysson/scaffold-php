@@ -9,17 +9,28 @@ CONST LANG_ES = 'es';
 
 function emailView(string $view, array $data = []): mixed
 {
-    extract($data);
     $fileDir = 'public' . DIRECTORY_SEPARATOR . 'email' . DIRECTORY_SEPARATOR;
 
+    if (str_contains($view, '..')) {
+        throw new RuntimeException('invalid view path');
+    }
+
     $filePath = $fileDir . $view . '.php';
+    $baseDir = realpath($fileDir) ?: $fileDir;
+    $realPath = realpath($filePath);
+
+    if ($realPath !== false && !str_starts_with($realPath, $baseDir)) {
+        throw new RuntimeException('invalid view path');
+    }
 
     if (!is_file($filePath)) {
         throw new RuntimeException('view not found');
     }
 
+    extract($data);
+
     ob_start();
-    include $filePath;
+    include $realPath ?: $filePath;
 
     return ob_get_clean();
 }
