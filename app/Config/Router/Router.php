@@ -130,7 +130,7 @@ class Router extends Dispatch
             ?: (explode(parent::$separator, $handler)[1] ? explode(parent::$separator, $handler)[1] : null));
     }
 
-    public static function route(string $name, ?array $data = null): ?string
+    public static function route(string $name, array $data = []): ?string
     {
         foreach (static::$routes as $http_verb) {
             foreach ($http_verb as $route_item) {
@@ -147,7 +147,7 @@ class Router extends Dispatch
 
     public static function redirect(
         string $route,
-        ?array $data = null,
+        array $data = [],
         int|HttpStatus $status = HttpStatus::MOVED_PERMANENTLY
     ): void
     {
@@ -188,7 +188,7 @@ class Router extends Dispatch
         exit;
     }
 
-    private static function treat(array $route_item, ?array $data = null): string
+    private static function treat(array $route_item, array $data = []): string
     {
         $route = $route_item['route'];
 
@@ -207,7 +207,7 @@ class Router extends Dispatch
         return parent::$projectUrl . $route;
     }
 
-    private static function process(string $route, array $arguments, ?array $params = null): string
+    private static function process(string $route, array $arguments, array $params = []): string
     {
         $params = (!empty($params) ? '?' . http_build_query($params) : null);
         return str_replace(array_keys($arguments), array_values($arguments), $route) . "{$params}";
