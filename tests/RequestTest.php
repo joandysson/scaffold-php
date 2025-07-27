@@ -8,7 +8,7 @@ use App\Config\Response\HttpStatus;
 
 class RequestTest extends TestCase
 {
-    public function testQueryParameters()
+    public function testQueryParameters(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/foo?bar=baz';
@@ -21,7 +21,7 @@ class RequestTest extends TestCase
         $this->assertSame('baz', $request->get('bar'));
     }
 
-    public function testJsonBody()
+    public function testJsonBody(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/api';
@@ -32,7 +32,7 @@ class RequestTest extends TestCase
         $this->assertSame(['name' => 'john'], $request->body());
     }
 
-    public function testFileUpload()
+    public function testFileUpload(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/upload';
@@ -55,7 +55,7 @@ class RequestTest extends TestCase
         $this->assertSame('/static', $request->path());
     }
 
-    public function testResponseJson()
+    public function testResponseJson(): void
     {
         $response = new Response();
         ob_start();

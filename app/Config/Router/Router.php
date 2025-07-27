@@ -48,32 +48,37 @@ class Router extends Dispatch
         return self::$namespace;
     }
 
-    public static function post($route, $handler, $name = null): void
+    public static function post(string $route, callable|string $handler, ?string $name = null): void
     {
         self::addRoute('POST', $route, $handler, $name);
     }
 
-    public static function get($route, $handler, $name = null): void
+    public static function get(string $route, callable|string $handler, ?string $name = null): void
     {
         self::addRoute('GET', $route, $handler, $name);
     }
 
-    public static function put($route, $handler, $name = null): void
+    public static function put(string $route, callable|string $handler, ?string $name = null): void
     {
         self::addRoute('PUT', $route, $handler, $name);
     }
 
-    public static function patch($route, $handler, $name = null): void
+    public static function patch(string $route, callable|string $handler, ?string $name = null): void
     {
         self::addRoute('PATCH', $route, $handler, $name);
     }
 
-    public static function delete($route, $handler, $name = null): void
+    public static function delete(string $route, callable|string $handler, ?string $name = null): void
     {
         self::addRoute('DELETE', $route, $handler, $name);
     }
 
-    protected static function addRoute($method, $route, $handler, $name = null): void
+    protected static function addRoute(
+        string $method,
+        string $route,
+        callable|string $handler,
+        ?string $name = null
+    ): void
     {
         if (self::$prefix !== '') {
             $route = self::$prefix . ($route === '/' ? '' : $route);
@@ -114,18 +119,18 @@ class Router extends Dispatch
         parent::$routes[$method][$route] = $router();
     }
 
-    private static function handler($handler, $namespace): Closure|string
+    private static function handler(callable|string $handler, string $namespace): Closure|string
     {
         return (!is_string($handler) ? $handler : "{$namespace}\\" . explode(parent::$separator, $handler)[0]);
     }
 
-    private static function action($handler): bool|string|null
+    private static function action(callable|string $handler): bool|string|null
     {
         return (!is_string($handler)
             ?: (explode(parent::$separator, $handler)[1] ? explode(parent::$separator, $handler)[1] : null));
     }
 
-    public static function route($name, $data = null): ?string
+    public static function route(string $name, ?array $data = null): ?string
     {
         foreach (static::$routes as $http_verb) {
             foreach ($http_verb as $route_item) {
@@ -142,7 +147,7 @@ class Router extends Dispatch
 
     public static function redirect(
         string $route,
-        $data = null,
+        ?array $data = null,
         int|HttpStatus $status = HttpStatus::MOVED_PERMANENTLY
     ): void
     {
@@ -183,7 +188,7 @@ class Router extends Dispatch
         exit;
     }
 
-    private static function treat(array $route_item, array $data = null): string
+    private static function treat(array $route_item, ?array $data = null): string
     {
         $route = $route_item['route'];
 
@@ -202,13 +207,13 @@ class Router extends Dispatch
         return parent::$projectUrl . $route;
     }
 
-    private static function process($route, array $arguments, array $params = null): string
+    private static function process(string $route, array $arguments, ?array $params = null): string
     {
         $params = (!empty($params) ? '?' . http_build_query($params) : null);
         return str_replace(array_keys($arguments), array_values($arguments), $route) . "{$params}";
     }
 
-    public static function getUrl($slice = null): array|string
+    public static function getUrl(?int $slice = null): array|string
     {
         $url = $_SERVER['REDIRECT_URL'] ?? ($_SERVER['REQUEST_URI'] ?? '/');
         $route = explode('/', $url);

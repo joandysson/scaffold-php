@@ -178,7 +178,7 @@ function intlFormatDate(string $date): string
 
 }
 
-function section(Closure $fun) {
+function section(Closure $fun): string {
     ob_start();
 
     $fun();

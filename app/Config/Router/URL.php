@@ -8,15 +8,14 @@ class URL
     private static array $url = [];
     public static array $labelPages = [];
 
-    public static function getLabelPage($url)
+    public static function getLabelPage(string|int $url): mixed
     {
-        return self::$labelPages[$url];
+        return self::$labelPages[$url] ?? null;
     }
 
-    public static function get($positions): string
+    public static function get(int|string ...$positions): string
     {
         self::checkURL();
-        $positions = func_get_args();
 
         if (! count($positions)) {
             return implode('/', self::$url);
