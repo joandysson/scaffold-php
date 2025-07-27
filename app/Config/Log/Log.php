@@ -17,8 +17,13 @@ class Log
 
         self::$driver = getenv('LOG_DRIVER') ?: 'file';
         self::$filePath = 'storage/logs/app.log';
-        if (self::$driver === 'file' && !is_dir(dirname(self::$filePath))) {
-            mkdir(dirname(self::$filePath), 0777, true);
+        if (self::$driver === 'file') {
+            $dir = dirname(self::$filePath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            } elseif (!is_writable($dir)) {
+                chmod($dir, 0755);
+            }
         }
         self::$initialized = true;
     }
@@ -28,8 +33,13 @@ class Log
         self::write('INFO', $message);
     }
 
-    public static function error(string $message): void
+    public static function error(string $message, ?\Throwable $exception = null): void
     {
+        if ($exception !== null) {
+            $message .= ' | ' . $exception->getMessage()
+                . ' in ' . $exception->getFile()
+                . ':' . $exception->getLine();
+        }
         self::write('ERROR', $message);
     }
 

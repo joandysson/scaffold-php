@@ -63,7 +63,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            Log::error($e->getMessage());
+            Log::error($e->getMessage(), $e);
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
@@ -86,7 +86,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $conn->lastInsertId();
         } catch (PDOException $e) {
-            Log::error($e->getMessage());
+            Log::error($e->getMessage(), $e);
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
@@ -102,7 +102,7 @@ abstract class BaseModel extends Connection
             $stmt->execute($params);
             return $stmt->rowCount();
         } catch (PDOException $e) {
-            Log::error($e->getMessage());
+            Log::error($e->getMessage(), $e);
             if (getenv('APP_DEBUG') === 'true') {
                 echo $e->getMessage();
             }
