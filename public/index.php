@@ -30,7 +30,7 @@ try {
         captureException($exception);
     }
 
-    Log::error($exception->getMessage());
+    Log::error($exception->getMessage(), $exception);
     if (getenv('APP_DEBUG') === 'true') {
         echo $exception->getMessage();
     }
