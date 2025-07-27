@@ -9,10 +9,10 @@ use App\Config\Response\HttpStatus;
 class Router extends Dispatch
 {
     /**
-     * Base namespace for controllers. Defaults to 'App\Controllers'.
+     * Base namespace for controller. Defaults to 'App\Controller'.
      * Can be changed using setNamespace().
      */
-    private static string $namespace = 'App\Controllers';
+    private static string $namespace = 'App\Controller';
 
     private static string $prefix = '';
 

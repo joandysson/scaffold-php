@@ -56,7 +56,7 @@ Router::get('/status', function () {
 });
 ```
 
-Para criar novos controladores basta adicioná-los em `app/Controllers` e registrar as rotas correspondentes. Os modelos ficam em `app/Models` e podem herdar de `BaseModel`.
+Para criar novos controladores basta adicioná-los em `app/Controller` e registrar as rotas correspondentes. Os modelos ficam em `app/Model` e podem herdar de `BaseModel`.
 
 #### Rotas de exemplo
 
@@ -75,8 +75,8 @@ tests/      Testes PHPUnit
 docker/     Imagens e configurações do Docker
 ```
 
-* `app/Controllers` contém as classes responsáveis por tratar as requisições.
-* `app/Models` guarda os modelos de domínio, que podem herdar de `BaseModel`.
+* `app/Controller` contém as classes responsáveis por tratar as requisições.
+* `app/Model` guarda os modelos de domínio, que podem herdar de `BaseModel`.
 * `public/` mantém `index.php` e templates de visualização.
 * `storage/` é usado para logs e arquivos temporários.
 * `docker/` concentra os arquivos de configuração das imagens utilizadas.
@@ -121,7 +121,7 @@ ser mockados normalmente através das ferramentas do PHPUnit.
 
 ### Exemplos avançados
 
-#### Controllers e middleware
+#### Controller e middleware
 
 ```php
 use App\Config\Router\Router;

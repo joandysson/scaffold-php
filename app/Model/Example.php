@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Model;
 
 use App\Config\Model\BaseModel;
 
 /**
- * @package App\Models
+ * @package App\Model
  */
 class Example extends BaseModel
 {
