@@ -7,7 +7,7 @@ set -e
 
 # Create .env from example if it does not exist
 if [ ! -f .env ]; then
-  cp .env.exemple .env
+  cp .env.example .env
   echo "Environment file created"
 fi
 
@@ -28,4 +28,3 @@ chmod -R 775 "$LOG_DIR"
 if [ ! -d vendor ]; then
   docker exec app composer install
 fi
-
