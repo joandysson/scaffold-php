@@ -27,7 +27,7 @@ docker/     Imagens e configurações do Docker
 Controladores ficam em `app/Controller`, modelos em `app/Model`, serviços em `app/Servive`, repositórios em `app/Repository` e as rotas padrão em `routes/web.php`.
 
 ## 5. Exemplo de uso
-- Copie `.env.exemple` para `.env` e ajuste as variáveis de ambiente.
+- Copie `.env.example` para `.env` e ajuste as variáveis de ambiente.
 - Para subir a aplicação: `docker compose up -d`.
 - Exemplo de rota em `routes/web.php`: `Router::get('/', 'HomeController:home');`.
 

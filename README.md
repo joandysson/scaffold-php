@@ -27,7 +27,7 @@ necessária, evitando conexões antecipadas.
 
 #### Configurações de ambiente
 
-As variáveis de ambiente estão documentadas em `.env.exemple`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. A tabela a seguir explica as principais chaves:
+As variáveis de ambiente estão documentadas em `.env.example`. Copie este arquivo para `.env` e ajuste os valores conforme sua necessidade. A tabela a seguir explica as principais chaves:
 
 |Variável|Descrição|
 |---|---|
@@ -84,7 +84,7 @@ docker/     Imagens e configurações do Docker
 ### Como instalar
 
 1. Clone este repositório.
-2. Copie `.env.exemple` para `.env` e configure as variáveis.
+2. Copie `.env.example` para `.env` e configure as variáveis.
 3. Execute `docker-compose up -d` para subir os containers.
 4. Caso a pasta `vendor/` não exista, entre no container `app` e rode `composer install`.
 5. A aplicação estará disponível em `http://localhost`.
