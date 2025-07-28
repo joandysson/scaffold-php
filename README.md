@@ -84,10 +84,9 @@ docker/     Imagens e configurações do Docker
 ### Como instalar
 
 1. Clone este repositório.
-2. Copie `.env.exemple` para `.env` e configure as variáveis.
-3. Execute `docker-compose up -d` para subir os containers.
-4. Caso a pasta `vendor/` não exista, entre no container `app` e rode `composer install`.
-5. A aplicação estará disponível em `http://localhost`.
+2. Execute `./start.sh` para criar o `.env`, ajustar permissões e iniciar os containers.
+3. Caso a pasta `vendor/` não exista, o script executará `composer install` dentro do container `app`.
+4. A aplicação estará disponível em `http://localhost`.
 
 ### Comandos úteis
 
