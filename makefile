@@ -24,3 +24,6 @@ build:
 
 clean-logs:
 	docker exec -it app sh -c "rm -rf ./storage/logs/*.log"
+
+composer-install:
+	docker exec -it app composer install
