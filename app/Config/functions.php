@@ -207,7 +207,7 @@ function make(callable|string $callable, array $routeParams = []): array|object
         $type = $param->getType();
         if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
             $className = $type->getName();
-            if (class_exists($className)) {
+            if (class_exists($className) || interface_exists($className)) {
                 $object = \App\Config\Container\Container::get($className);
                 if ($object instanceof \App\Config\Request\Request) {
                     $object->setRouteParams($routeParams);
