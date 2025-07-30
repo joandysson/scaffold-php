@@ -54,13 +54,9 @@ function e(string $value): string
 
 function dd(mixed $data): void
 {
-    if (getenv('APP_DEBUG') === 'true') {
-        echo '<pre>';
-        var_dump($data);
-        die;
-    }
-
-    \App\Config\Log\Log::error(is_string($data) ? $data : var_export($data, true));
+    echo '<pre>';
+    var_dump($data);
+    die;
 }
 
 /**
@@ -69,12 +65,8 @@ function dd(mixed $data): void
  */
 function pd(mixed $data): void
 {
-    if (getenv('APP_DEBUG') === 'true') {
-        echo '<pre>', print_r($data, true);
-        die;
-    }
-
-    \App\Config\Log\Log::error(is_string($data) ? $data : var_export($data, true));
+    echo '<pre>', print_r($data, true);
+    die;
 }
 
 /**

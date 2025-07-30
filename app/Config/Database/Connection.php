@@ -48,9 +48,6 @@ abstract class Connection
             self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             Log::error($e->getMessage(), $e);
-            if (getenv('APP_DEBUG') === 'true') {
-                echo $e->getMessage();
-            }
         }
     }
 
@@ -75,9 +72,6 @@ abstract class Connection
         } catch (PDOException $e) {
             $conn->rollBack();
             Log::error($e->getMessage(), $e);
-            if (getenv('APP_DEBUG') === 'true') {
-                echo $e->getMessage();
-            }
         }
     }
 }
