@@ -16,6 +16,9 @@ class ServiceWithDependency
     }
 }
 
+interface SampleInterface {}
+class SampleImplementation implements SampleInterface {}
+
 class ContainerTest extends TestCase
 {
     protected function tearDown(): void
@@ -43,5 +46,12 @@ class ContainerTest extends TestCase
     {
         $object = Container::get(ServiceWithDependency::class);
         $this->assertInstanceOf(Dependency::class, $object->dep);
+    }
+
+    public function testResolveBoundInterface(): void
+    {
+        Container::set(SampleInterface::class, SampleImplementation::class);
+        $params = make(function (SampleInterface $s) {}, []);
+        $this->assertInstanceOf(SampleImplementation::class, $params[0]);
     }
 }
