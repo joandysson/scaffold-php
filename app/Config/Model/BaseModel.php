@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace App\Config\Model;
 
 use App\Config\Database\Connection;
-use App\Config\Log\Log;
 use PDO;
-use PDOException;
 
 /**
  * class BaseModel
@@ -53,19 +51,15 @@ abstract class BaseModel extends Connection
     /**
      * @param string $query
      * @param array $params
-     * @return array|bool
+     * @return array
      */
-    protected static function queryRaw(string $query, array $params = []): array|bool
+    protected static function queryRaw(string $query, array $params = []): array
     {
-        try {
-            $conn = parent::getConnection();
-            $stmt = $conn->prepare($query);
-            $stmt->execute($params);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            Log::error($e->getMessage(), $e);
-            return false;
-        }
+        $conn = parent::getConnection();
+        $stmt = $conn->prepare($query);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -73,32 +67,24 @@ abstract class BaseModel extends Connection
      *
      * @param string $query
      * @param array $params
-     * @return int|bool
+     * @return string
      */
-    protected static function save(string $query, array $params): mixed
+    protected static function save(string $query, array $params): string
     {
-        try {
-            $conn = parent::getConnection();
-            $stmt = $conn->prepare($query);
-            $stmt->execute($params);
-            return $conn->lastInsertId();
-        } catch (PDOException $e) {
-            Log::error($e->getMessage(), $e);
-            return false;
-        }
+        $conn = parent::getConnection();
+        $stmt = $conn->prepare($query);
+        $stmt->execute($params);
+
+        return $conn->lastInsertId();
     }
 
     protected static function execUpdate(string $query, array $params): int
     {
-        try {
-            $conn = parent::getConnection();
-            $stmt = $conn->prepare($query);
-            $stmt->execute($params);
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            Log::error($e->getMessage(), $e);
-            return 0;
-        }
+        $conn = parent::getConnection();
+        $stmt = $conn->prepare($query);
+        $stmt->execute($params);
+
+        return $stmt->rowCount();
     }
 
     /**
