@@ -4,15 +4,12 @@ use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
-use App\Middleware\CorsMiddleware;
 
-// Middlewares are executed before each matched route.
-// Register them using Router::addMiddleware().
-// Example:
-// Router::addMiddleware(function (Request $req) {
-//     // Authentication or logging logic
-// });
-Router::addMiddleware(new CorsMiddleware());
+// Register global middlewares listed in app/Config/middleware.php.
+$middlewares = require dirname(__DIR__) . '/app/Config/middleware.php';
+foreach ($middlewares as $middleware) {
+    Router::addMiddleware(new $middleware());
+}
 
 // Uncomment to prefix all routes with a base path
 // Router::prefix('/api/v1');
