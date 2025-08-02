@@ -4,6 +4,7 @@ use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
+use App\Middleware\CorsMiddleware;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -11,6 +12,7 @@ use App\Config\Response\Response;
 // Router::addMiddleware(function (Request $req) {
 //     // Authentication or logging logic
 // });
+Router::addMiddleware(new CorsMiddleware());
 
 // Uncomment to prefix all routes with a base path
 // Router::prefix('/api/v1');
