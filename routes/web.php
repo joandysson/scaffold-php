@@ -5,12 +5,6 @@ use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
 
-// Register global middlewares listed in app/Config/middleware.php.
-$middlewares = require dirname(__DIR__) . '/app/Config/middleware.php';
-foreach ($middlewares as $middleware) {
-    Router::addMiddleware(new $middleware());
-}
-
 // Uncomment to prefix all routes with a base path
 // Router::prefix('/api/v1');
 // Basic GET route using a controller action

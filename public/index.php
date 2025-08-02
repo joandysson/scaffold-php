@@ -29,6 +29,12 @@ if (getenv('APP_STAGE') === 'PROD') {
 
 errorReporting(getenv('APP_DEBUG') === 'true');
 
+// Register global middlewares listed in app/Config/middleware.php.
+$middlewares = require dirname(__DIR__) . '/app/Config/middleware.php';
+foreach ($middlewares as $middleware) {
+    Router::addMiddleware(new $middleware());
+}
+
 try {
     new Router;
 } catch (\Throwable $exception) {
