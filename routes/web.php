@@ -5,6 +5,13 @@ use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
 
+// Middlewares are executed before each matched route.
+// Register them using Router::addMiddleware().
+// Example:
+// Router::addMiddleware(function (Request $req) {
+//     // Authentication or logging logic
+// });
+
 // Uncomment to prefix all routes with a base path
 // Router::prefix('/api/v1');
 // Basic GET route using a controller action
