@@ -3,10 +3,16 @@ on:
   push:
     branches:
       - main
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - labeled
 jobs:
   setup-env:
     name: env
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request_target' && github.event.label.name == 'deploy')
     defaults:
       run:
         shell: bash
