@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Cron\CronInterface as CronCronInterface;
+use App\Cron\CronInterface;
 use App\Cron\CronRunner;
 use App\Cron\ExampleCron;
 use Dotenv\Dotenv;
@@ -26,13 +26,10 @@ $tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 
 
 $cron = isset($tasks[$task]) ? new $tasks[$task]() : "Task '{$task}' not found.";
 
-if ($cron instanceof CronCronInterface) {
-
+if ($cron instanceof CronInterface) {
     echo 'Executing task: ' . $task . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
 
     $cron->run();
 
-    echo 'Task ' . $task . ' executed successfully' . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
-
-    exit();
+    echo 'Task ' . $task . ' executed successfully - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
 }
