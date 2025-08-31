@@ -5,6 +5,15 @@
          failOnRisky="true"
          cacheDirectory=".phpunit.cache">
 
+    <coverage>
+        <include>
+            <directory>app</directory>
+        </include>
+        <exclude>
+            <directory>app/Config</directory>
+        </exclude>
+    </coverage>
+
     <testsuites>
         <testsuite name="Default">
             <directory suffix="Test.php">tests</directory>
