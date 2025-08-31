@@ -39,7 +39,10 @@ class CorsMiddleware
 
         if ($request->method() === 'OPTIONS') {
             http_response_code(204);
-            exit;
+            if (!defined('APP_TESTING')) {
+                exit;
+            }
+            return;
         }
     }
 }
