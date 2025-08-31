@@ -26,13 +26,11 @@ $tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 
 
 $cron = isset($tasks[$task]) ? new $tasks[$task]() : "Task '{$task}' not found.";
 
-if ($cron instanceof CronCronInterface) {
+    if ($cron instanceof CronCronInterface) {
 
-    echo 'Executing task: ' . $task . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
+        echo 'Executing task: ' . $task . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
 
-    $cron->run();
+        $cron->run();
 
-    echo 'Task ' . $task . ' executed successfully' . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
-
-    exit();
-}
+        echo 'Task ' . $task . ' executed successfully' . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
+    }

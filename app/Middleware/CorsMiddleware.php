@@ -39,7 +39,7 @@ class CorsMiddleware
 
         if ($request->method() === 'OPTIONS') {
             http_response_code(204);
-            exit;
+            return;
         }
     }
 }
