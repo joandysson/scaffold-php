@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Config\Router;
 
 use App\Config\Response\HttpStatus;
+use App\Config\Response\Response;
 use App\Config\Request\Request;
 use RuntimeException;
 
@@ -90,8 +91,8 @@ abstract class Dispatch
                 foreach (self::$middlewares as $middleware) {
                     $middleware($request);
                 }
-                call_user_func_array(self::$route['handler'], $params);
-                return true;
+                $result = call_user_func_array(self::$route['handler'], $params);
+                return self::emit($result);
             }
 
             $controller = self::$route['handler'];
@@ -124,12 +125,30 @@ abstract class Dispatch
             foreach (self::$middlewares as $middleware) {
                 $middleware($request);
             }
-            $newController->$method(...$params);
-            return true;
+            $result = $newController->$method(...$params);
+            return self::emit($result);
         }
 
         self::$error = self::NOT_FOUND;
         return false;
     }
 
+    private static function emit(mixed $result): bool
+    {
+        if ($result instanceof Response) {
+            $result->send();
+            return true;
+        }
+        if (is_array($result)) {
+            $response = (new Response())->json($result, HttpStatus::OK);
+            $response->send();
+            return true;
+        }
+        if (is_string($result)) {
+            $response = new Response();
+            $response->send($result, HttpStatus::OK);
+            return true;
+        }
+        return true;
+    }
 }

@@ -59,7 +59,7 @@ class RequestTest extends TestCase
     {
         $response = new Response();
         ob_start();
-        $response->json(['a' => 1], HttpStatus::CREATED);
+        $response->json(['a' => 1], HttpStatus::CREATED)->send();
         $output = ob_get_clean();
 
         $this->assertSame('{"a":1}', $output);
@@ -70,7 +70,7 @@ class RequestTest extends TestCase
     {
         $response = new Response();
         ob_start();
-        $response->json(['b' => 2], HttpStatus::CREATED);
+        $response->json(['b' => 2], HttpStatus::CREATED)->send();
         $output = ob_get_clean();
 
         $this->assertSame('{"b":2}', $output);

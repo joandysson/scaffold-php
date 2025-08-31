@@ -11,6 +11,7 @@ class Response
 {
     private int $status = HttpStatus::OK->value;
     private array $headers = [];
+    private string $content = '';
 
     public function setStatus(int|HttpStatus $status): self
     {
@@ -27,18 +28,19 @@ class Response
         return $this;
     }
 
-    public function json(array $data, int|HttpStatus $status = HttpStatus::OK): void
+    public function json(array $data, int|HttpStatus $status = HttpStatus::OK): self
     {
         $this->setStatus($status);
         $this->addHeader('Content-Type', 'application/json');
-        echo json_encode($data);
+        $this->content = json_encode($data);
+        return $this;
     }
 
     public function view(
         string $view,
         array $data = [],
         int|HttpStatus $status = HttpStatus::OK
-    ): void {
+    ): self {
         $this->setStatus($status);
 
         $fileDir = 'public' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
@@ -64,13 +66,19 @@ class Response
         ob_start();
         include $realPath ?: $filePath;
 
-        echo ob_get_clean();
+        $this->content = ob_get_clean();
+        return $this;
     }
 
-    public function send(string $content, int|HttpStatus $status = HttpStatus::OK): void
+    public function send(?string $content = null, int|HttpStatus $status = null): void
     {
-        $this->setStatus($status);
-        echo $content;
+        if ($content !== null) {
+            $this->content = $content;
+        }
+        if ($status !== null) {
+            $this->setStatus($status);
+        }
+        echo $this->content;
     }
 
     public function getStatus(): int
