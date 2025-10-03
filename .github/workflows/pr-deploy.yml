@@ -12,7 +12,7 @@ jobs:
     if: >-
       github.event.label.name == 'deploy' &&
       github.event.pull_request.state == 'open' &&
-      github.base_ref == 'main'
+      github.event.pull_request.base.ref == 'main'
     uses: ./.github/workflows/main.yml
     with:
       run_setup_env: true

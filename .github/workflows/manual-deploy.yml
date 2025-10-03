@@ -1,0 +1,21 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_setup_env:
+        description: "Run the setup-env job"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/main.yml
+    with:
+      run_setup_env: ${{ inputs.run_setup_env }}
+    secrets: inherit
+
