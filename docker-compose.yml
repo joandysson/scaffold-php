@@ -12,7 +12,19 @@ services:
         volumes:
             - ./docker/db:/docker-entrypoint-initdb.d
             - scaffold_db:/var/lib/mysql
+
+    composer:
+        container_name: composer
+        image: scaffold-php-app
+        volumes:
+        - ./:/var/www/html
+        working_dir: /var/www/html
+        command: composer install
+        depends_on:
+            - app
+
     app:
+        image: scaffold-php-app
         build:
             context: ./docker/php/
             args:
