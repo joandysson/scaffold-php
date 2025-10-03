@@ -16,7 +16,7 @@ $tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 
 $task = $argv[1] ?? null;
 
 if (is_null($task)) {
-    echo 'Any task was provided.';
+    echo 'Any task was provided....';
     exit();
 }
 
