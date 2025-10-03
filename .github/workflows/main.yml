@@ -6,12 +6,20 @@ on:
   #     - main
   # Allow this workflow to be called from other workflows
   workflow_call:
+    inputs:
+      run_setup_env:
+        description: "Run the setup-env job"
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
 
 jobs:
   setup-env:
     name: env
     runs-on: ubuntu-latest
+    # Run normally on push/merge; honor input only when called
+    if: ${{ github.event_name != 'workflow_call' || inputs.run_setup_env == true }}
     defaults:
       run:
         shell: bash
