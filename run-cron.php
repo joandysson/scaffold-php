@@ -13,18 +13,18 @@ $dotenv->load();
 $runner = new CronRunner();
 $tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'cron.php';
 
+$task = $argv[1] ?? null;
+
+if (is_null($task)) {
+    echo 'Any task was provided.';
+    exit();
+}
+
 foreach ($tasks as $name => $class) {
     if (class_exists($class)) {
         $runner->register($name, new $class());
     }
 }
-
-if (!isset($argv[1])) {
-    echo 'Any task was provided.';
-    exit();
-}
-
-$task = $argv[1];
 
 try {
     echo 'Executing task: ' . $task . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
