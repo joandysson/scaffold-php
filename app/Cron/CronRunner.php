@@ -19,13 +19,17 @@ final class CronRunner
 
     public function run(string $name): void
     {
-        if (!isset($this->tasks[$name])) {
+        if (!array_key_exists($name, $this->tasks)) {
             throw new InvalidArgumentException("Task '{$name}' not found.");
         }
 
-        echo 'Executing task: ' . $name . ' - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
-        $this->tasks[$name]->run();
-        echo 'Task ' . $name . ' executed successfully - ' . date('Y-m-d\TH:i:s') . PHP_EOL;
+        $task = $this->tasks[$name];
+
+        if (!$task instanceof CronInterface) {
+            throw new InvalidArgumentException("Task '{$name}' is not a valid cron task.");
+        }
+
+        $task->run();
     }
 
     /**

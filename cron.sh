@@ -19,4 +19,4 @@ fi
 '
 
 echo "Running cron job $1"
-php run-cron.php "$1"
+php -d display_errors=1 run-cron.php "$1"

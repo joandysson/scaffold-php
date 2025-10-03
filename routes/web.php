@@ -52,5 +52,5 @@ if (Router::error()) {
     (new Response)->json(
         ['error' => 'Not Found'],
         HttpStatus::NOT_FOUND
-    );
+    )->send();
 }
