@@ -1,9 +1,9 @@
 name: CI CD Prod
 on:
   # Keep push disabled for scaffold repos
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   # Allow this workflow to be called from other workflows
   workflow_call:
     inputs:
