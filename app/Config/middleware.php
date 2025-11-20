@@ -4,5 +4,4 @@
  */
 return [
     App\Middleware\CorsMiddleware::class,
-    App\Middleware\SwaggerAuthMiddleware::class,
 ];

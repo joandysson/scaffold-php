@@ -8,20 +8,8 @@ use App\Config\Response\HttpStatus;
 
 class SwaggerAuthMiddleware
 {
-    /**
-     * @var string[]
-     */
-    private array $protectedPaths = ['/swagger', '/swagger.json'];
-
     public function __invoke(Request $request): void
     {
-        $path = rtrim($request->path(), '/');
-        $path = $path === '' ? '/' : $path;
-
-        if (!in_array($path, $this->protectedPaths, true)) {
-            return;
-        }
-
         $username = getenv('SWAGGER_USERNAME') ?: null;
         $password = getenv('SWAGGER_PASSWORD') ?: null;
 

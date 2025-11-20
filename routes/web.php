@@ -4,6 +4,7 @@ use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
+use App\Middleware\SwaggerAuthMiddleware;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -33,58 +34,42 @@ Router::post('/submit', function () {
 
 Router::get('/health', 'HealthController:show');
 
-Router::get('/swagger.json', function () {
-    $spec = [
-        'openapi' => '3.0.3',
-        'info' => [
-            'title' => 'Scaffold PHP API',
-            'version' => '1.0.0',
-            'description' => 'Basic health check endpoint.',
-        ],
-        'paths' => [
-            '/health' => [
-                'get' => [
-                    'summary' => 'Health check',
-                    'tags' => ['Health'],
-                    'responses' => [
-                        '200' => [
-                            'description' => 'Application is healthy.',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'status' => [
-                                                'type' => 'string',
-                                                'example' => 'ok',
-                                            ],
-                                        ],
-                                        'required' => ['status'],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'security' => [
-                        ['basicAuth' => []],
-                    ],
-                ],
-            ],
-        ],
-        'components' => [
-            'securitySchemes' => [
-                'basicAuth' => [
-                    'type' => 'http',
-                    'scheme' => 'basic',
-                ],
-            ],
-        ],
-    ];
+Router::get('/swagger.json', function (Request $request) {
+    (new SwaggerAuthMiddleware())($request);
+
+    $swaggerPath = __DIR__ . '/../docs/swagger.json';
+
+    if (!is_file($swaggerPath)) {
+        return (new Response())->json(
+            ['error' => 'Swagger document not found.'],
+            HttpStatus::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    $contents = file_get_contents($swaggerPath);
+
+    if ($contents === false) {
+        return (new Response())->json(
+            ['error' => 'Unable to load Swagger document.'],
+            HttpStatus::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    $spec = json_decode($contents, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return (new Response())->json(
+            ['error' => 'Swagger document is invalid JSON.'],
+            HttpStatus::INTERNAL_SERVER_ERROR
+        );
+    }
 
     return (new Response())->json($spec);
 });
 
-Router::get('/swagger', function () {
+Router::get('/swagger', function (Request $request) {
+    (new SwaggerAuthMiddleware())($request);
+
     return (new Response())->view('swagger');
 });
 
