@@ -97,6 +97,18 @@ docker/     Imagens e configurações do Docker
 - `make cron name=ExampleCron` executa uma tarefa agendada de exemplo. Quando o nome for omitido, o script mostrará as tarefas disponíveis.
 - `make ci` roda todas as verificações e testes dentro do container.
 
+### Documentação da API
+
+O arquivo `docs/api.json` é gerado automaticamente a partir das anotações OpenAPI presentes em `app/`. Após alterar
+ou adicionar endpoints, execute na raiz do projeto:
+
+```sh
+php vendor/bin/openapi --output docs/api.json app
+```
+
+O comando acima valida as anotações e sobrescreve o arquivo de especificação utilizado pelo Swagger UI protegido por
+Basic Auth.
+
 ### Tarefas agendadas
 
 Tarefas de cron são registradas no arquivo `app/Config/cron.php`. Para executar
