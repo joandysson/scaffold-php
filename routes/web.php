@@ -6,7 +6,6 @@ use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
 use App\Middleware\BasicAuthMiddleware;
 use OpenApi\Generator;
-use Throwable;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -40,7 +39,7 @@ Router::middleware([BasicAuthMiddleware::class])->get('/swagger.json', function 
     try {
         $openApi = Generator::scan([__DIR__ . '/../app']);
         $spec = json_decode($openApi->toJson(), true, 512, JSON_THROW_ON_ERROR);
-    } catch (Throwable $exception) {
+    } catch (\Throwable $exception) {
         return (new Response())->json(
             ['error' => 'Failed to generate Swagger document.'],
             HttpStatus::INTERNAL_SERVER_ERROR
