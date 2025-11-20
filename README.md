@@ -37,7 +37,7 @@ As variáveis de ambiente estão documentadas em `.env.example`. Copie este arqu
 |`APP_DEBUG`|Habilita a exibição de erros no navegador quando definido como `true`.|
 |`LOG_DRIVER`|Define onde os logs são gravados (`file` gera arquivos em `storage/logs/`, `error_log` envia para o log do PHP).|
 
-Há chaves extras como `SAFE_BROWSING_URL` ou `MONGO_USER` que servem como exemplo para integrações futuras e podem ser removidas se não forem necessárias.
+Há chaves extras como `SAFE_BROWSING_URL` que servem como exemplo para integrações futuras e podem ser removidas se não forem necessárias.
 
 #### Exemplo de roteamento
 
