@@ -66,5 +66,18 @@ namespace {
             ob_get_clean();
             $this->assertTrue(FlagMiddleware::$called);
         }
+
+        public function testMiddlewareInstantiatedFromClassName(): void
+        {
+            $this->setServer('GET', '/middleware-class');
+            Router::addMiddleware(FlagMiddleware::class);
+            Router::get('/middleware-class', function () {
+                echo 'ok';
+            });
+            ob_start();
+            Router::run();
+            ob_get_clean();
+            $this->assertTrue(FlagMiddleware::$called);
+        }
     }
 }

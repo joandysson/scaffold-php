@@ -36,9 +36,12 @@ Router::post('/submit', function () {
 
 Router::get('/health', 'HealthController:show');
 
-Router::get('/swagger.json', function (Request $request) {
-    (new SwaggerAuthMiddleware())($request);
+$requestPath = explode('?', $_SERVER['REQUEST_URI'])[0];
+if (in_array($requestPath, ['/swagger', '/swagger.json'], true)) {
+    Router::addMiddleware(SwaggerAuthMiddleware::class);
+}
 
+Router::get('/swagger.json', function (Request $request) {
     try {
         $openApi = Generator::scan([__DIR__ . '/../app']);
         $spec = json_decode($openApi->toJson(), true, 512, JSON_THROW_ON_ERROR);
@@ -53,8 +56,6 @@ Router::get('/swagger.json', function (Request $request) {
 });
 
 Router::get('/swagger', function (Request $request) {
-    (new SwaggerAuthMiddleware())($request);
-
     return (new Response())->view('swagger');
 });
 

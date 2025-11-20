@@ -47,8 +47,12 @@ abstract class Dispatch
         return self::$error;
     }
 
-    public static function addMiddleware(callable $middleware): void
+    public static function addMiddleware(string|callable $middleware): void
     {
+        if (is_string($middleware)) {
+            $middleware = new $middleware();
+        }
+
         self::$middlewares[] = $middleware;
     }
 
