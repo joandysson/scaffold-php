@@ -6,7 +6,7 @@ namespace App\Middleware;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 
-class SwaggerAuthMiddleware
+class BasicAuthMiddleware
 {
     public function __invoke(Request $request): void
     {

@@ -4,7 +4,7 @@ use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
-use App\Middleware\SwaggerAuthMiddleware;
+use App\Middleware\BasicAuthMiddleware;
 use OpenApi\Generator;
 use Throwable;
 
@@ -36,7 +36,7 @@ Router::post('/submit', function () {
 
 Router::get('/health', 'HealthController:show');
 
-Router::middleware([SwaggerAuthMiddleware::class])->get('/swagger.json', function (Request $request) {
+Router::middleware([BasicAuthMiddleware::class])->get('/swagger.json', function (Request $request) {
     try {
         $openApi = Generator::scan([__DIR__ . '/../app']);
         $spec = json_decode($openApi->toJson(), true, 512, JSON_THROW_ON_ERROR);
@@ -50,7 +50,7 @@ Router::middleware([SwaggerAuthMiddleware::class])->get('/swagger.json', functio
     return (new Response())->json($spec);
 });
 
-Router::middleware([SwaggerAuthMiddleware::class])->get('/swagger', function (Request $request) {
+Router::middleware([BasicAuthMiddleware::class])->get('/swagger', function (Request $request) {
     return (new Response())->view('swagger');
 });
 
