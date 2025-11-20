@@ -79,5 +79,32 @@ namespace {
             ob_get_clean();
             $this->assertTrue(FlagMiddleware::$called);
         }
+
+        public function testRouteSpecificMiddlewareIsExecuted(): void
+        {
+            $this->setServer('GET', '/middleware-scoped');
+            Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
+                echo 'ok';
+            });
+            ob_start();
+            Router::run();
+            ob_get_clean();
+            $this->assertTrue(FlagMiddleware::$called);
+        }
+
+        public function testRouteSpecificMiddlewareDoesNotAffectOtherRoutes(): void
+        {
+            $this->setServer('GET', '/no-middleware');
+            Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
+                echo 'ok';
+            });
+            Router::get('/no-middleware', function () {
+                echo 'ok';
+            });
+            ob_start();
+            Router::run();
+            ob_get_clean();
+            $this->assertFalse(FlagMiddleware::$called);
+        }
     }
 }
