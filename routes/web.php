@@ -31,6 +31,63 @@ Router::post('/submit', function () {
     echo 'Form submitted';
 });
 
+Router::get('/health', 'HealthController:show');
+
+Router::get('/swagger.json', function () {
+    $spec = [
+        'openapi' => '3.0.3',
+        'info' => [
+            'title' => 'Scaffold PHP API',
+            'version' => '1.0.0',
+            'description' => 'Basic health check endpoint.',
+        ],
+        'paths' => [
+            '/health' => [
+                'get' => [
+                    'summary' => 'Health check',
+                    'tags' => ['Health'],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Application is healthy.',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'status' => [
+                                                'type' => 'string',
+                                                'example' => 'ok',
+                                            ],
+                                        ],
+                                        'required' => ['status'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'security' => [
+                        ['basicAuth' => []],
+                    ],
+                ],
+            ],
+        ],
+        'components' => [
+            'securitySchemes' => [
+                'basicAuth' => [
+                    'type' => 'http',
+                    'scheme' => 'basic',
+                ],
+            ],
+        ],
+    ];
+
+    return (new Response())->json($spec);
+});
+
+Router::get('/swagger', function () {
+    return (new Response())->view('swagger');
+});
+
 // PUT, PATCH and DELETE examples
 Router::put('/posts/{id}', 'HomeController:update');
 Router::patch('/posts/{id}', 'HomeController:partialUpdate');
