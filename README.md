@@ -37,7 +37,7 @@ As variáveis de ambiente estão documentadas em `.env.example`. Copie este arqu
 |`APP_DEBUG`|Habilita a exibição de erros no navegador quando definido como `true`.|
 |`LOG_DRIVER`|Define onde os logs são gravados (`file` gera arquivos em `storage/logs/`, `error_log` envia para o log do PHP).|
 
-Há chaves extras como `SAFE_BROWSING_URL` ou `MONGO_USER` que servem como exemplo para integrações futuras e podem ser removidas se não forem necessárias.
+Há chaves extras como `SAFE_BROWSING_URL` que servem como exemplo para integrações futuras e podem ser removidas se não forem necessárias.
 
 #### Exemplo de roteamento
 
@@ -96,6 +96,18 @@ docker/     Imagens e configurações do Docker
 - `composer audit` verifica vulnerabilidades nas dependências.
 - `make cron name=ExampleCron` executa uma tarefa agendada de exemplo. Quando o nome for omitido, o script mostrará as tarefas disponíveis.
 - `make ci` roda todas as verificações e testes dentro do container.
+
+### Documentação da API
+
+O arquivo `docs/api.json` é gerado automaticamente a partir das anotações OpenAPI presentes em `app/` e em `docs/`.
+Após alterar ou adicionar endpoints, execute na raiz do projeto:
+
+```sh
+php docs/generate-api.php
+```
+
+O script utiliza o método `Generator::generate()` do swagger-php para evitar o uso do `scan()` depreciado, valida as
+anotações e sobrescreve o arquivo de especificação utilizado pelo Swagger UI protegido por Basic Auth.
 
 ### Tarefas agendadas
 

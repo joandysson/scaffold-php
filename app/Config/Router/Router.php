@@ -48,36 +48,62 @@ class Router extends Dispatch
         return self::$namespace;
     }
 
-    public static function post(string $route, callable|string $handler, ?string $name = null): void
+    public static function middleware(array $middlewares): RouteMiddlewareRegistrar
     {
-        self::addRoute('POST', $route, $handler, $name);
+        return new RouteMiddlewareRegistrar($middlewares);
     }
 
-    public static function get(string $route, callable|string $handler, ?string $name = null): void
-    {
-        self::addRoute('GET', $route, $handler, $name);
+    public static function post(
+        string $route,
+        callable|string $handler,
+        ?string $name = null,
+        array $middlewares = []
+    ): void {
+        self::addRoute('POST', $route, $handler, $name, $middlewares);
     }
 
-    public static function put(string $route, callable|string $handler, ?string $name = null): void
-    {
-        self::addRoute('PUT', $route, $handler, $name);
+    public static function get(
+        string $route,
+        callable|string $handler,
+        ?string $name = null,
+        array $middlewares = []
+    ): void {
+        self::addRoute('GET', $route, $handler, $name, $middlewares);
     }
 
-    public static function patch(string $route, callable|string $handler, ?string $name = null): void
-    {
-        self::addRoute('PATCH', $route, $handler, $name);
+    public static function put(
+        string $route,
+        callable|string $handler,
+        ?string $name = null,
+        array $middlewares = []
+    ): void {
+        self::addRoute('PUT', $route, $handler, $name, $middlewares);
     }
 
-    public static function delete(string $route, callable|string $handler, ?string $name = null): void
-    {
-        self::addRoute('DELETE', $route, $handler, $name);
+    public static function patch(
+        string $route,
+        callable|string $handler,
+        ?string $name = null,
+        array $middlewares = []
+    ): void {
+        self::addRoute('PATCH', $route, $handler, $name, $middlewares);
+    }
+
+    public static function delete(
+        string $route,
+        callable|string $handler,
+        ?string $name = null,
+        array $middlewares = []
+    ): void {
+        self::addRoute('DELETE', $route, $handler, $name, $middlewares);
     }
 
     protected static function addRoute(
         string $method,
         string $route,
         callable|string $handler,
-        ?string $name = null
+        ?string $name = null,
+        array $middlewares = []
     ): void
     {
         if (self::$prefix !== '') {
@@ -103,14 +129,15 @@ class Router extends Dispatch
         $data = $params;
 
         $namespace = self::$namespace;
-        $router = function () use ($method, $handler, $data, $route, $name, $namespace) {
+        $router = function () use ($method, $handler, $data, $route, $name, $namespace, $middlewares) {
             return [
                 'route' => $route,
                 'name' => $name,
                 'method' => $method,
                 'handler' => self::handler($handler, $namespace),
                 'action' => self::action($handler),
-                'data' => $data
+                'data' => $data,
+                'middlewares' => array_map([self::class, 'normalizeMiddleware'], $middlewares)
             ];
         };
 

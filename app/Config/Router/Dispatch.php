@@ -47,9 +47,14 @@ abstract class Dispatch
         return self::$error;
     }
 
-    public static function addMiddleware(callable $middleware): void
+    public static function addMiddleware(string|callable $middleware): void
     {
-        self::$middlewares[] = $middleware;
+        self::$middlewares[] = self::normalizeMiddleware($middleware);
+    }
+
+    public static function normalizeMiddleware(string|callable $middleware): callable
+    {
+        return is_string($middleware) ? new $middleware() : $middleware;
     }
 
     public static function run(): bool
@@ -88,8 +93,12 @@ abstract class Dispatch
                     $request = new Request();
                     $request->setRouteParams(self::$route['data'] ?? []);
                 }
-                foreach (self::$middlewares as $middleware) {
-                    $middleware($request);
+                foreach (self::middlewaresForRoute() as $middleware) {
+                    $middlewareResult = $middleware($request);
+                    if ($middlewareResult instanceof Response) {
+                        $middlewareResult->send();
+                        return true;
+                    }
                 }
                 $result = call_user_func_array(self::$route['handler'], $params);
                 return self::emit($result);
@@ -122,8 +131,12 @@ abstract class Dispatch
                 $request = new Request();
                 $request->setRouteParams(self::$route['data'] ?? []);
             }
-            foreach (self::$middlewares as $middleware) {
-                $middleware($request);
+            foreach (self::middlewaresForRoute() as $middleware) {
+                $middlewareResult = $middleware($request);
+                if ($middlewareResult instanceof Response) {
+                    $middlewareResult->send();
+                    return true;
+                }
             }
             $result = $newController->$method(...$params);
             return self::emit($result);
@@ -131,6 +144,16 @@ abstract class Dispatch
 
         self::$error = self::NOT_FOUND;
         return false;
+    }
+
+    /**
+     * @return callable[]
+     */
+    private static function middlewaresForRoute(): array
+    {
+        $routeMiddlewares = self::$route['middlewares'] ?? [];
+
+        return array_merge(self::$middlewares, $routeMiddlewares);
     }
 
     private static function emit(mixed $result): bool

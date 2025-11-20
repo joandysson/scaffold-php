@@ -4,6 +4,7 @@ use App\Config\Router\Router;
 use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
+use App\Middleware\BasicAuthMiddleware;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -29,6 +30,34 @@ Router::get('/hello/{name}', function (Request $request) {
 // POST route example
 Router::post('/submit', function () {
     echo 'Form submitted';
+});
+
+Router::get('/health', 'HealthController:show');
+
+Router::middleware([BasicAuthMiddleware::class])->get('/api.json', function (Request $request) {
+    $documentPath = __DIR__ . '/../docs/api.json';
+
+    if (!is_file($documentPath)) {
+        return (new Response())->json(
+            ['error' => 'API document not found.'],
+            HttpStatus::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    try {
+        $spec = json_decode(file_get_contents($documentPath) ?: '', true, 512, JSON_THROW_ON_ERROR);
+    } catch (\Throwable $exception) {
+        return (new Response())->json(
+            ['error' => 'Failed to load API document.'],
+            HttpStatus::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    return (new Response())->json($spec);
+});
+
+Router::middleware([BasicAuthMiddleware::class])->get('/swagger', function (Request $request) {
+    return (new Response())->view('swagger');
 });
 
 // PUT, PATCH and DELETE examples
