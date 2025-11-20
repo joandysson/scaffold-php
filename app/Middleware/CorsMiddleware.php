@@ -9,12 +9,12 @@ use App\Config\Response\Response;
 
 class CorsMiddleware
 {
-    public function __invoke(Request $request): void
+    public function __invoke(Request $request): ?Response
     {
         $config = require dirname(__DIR__) . '/Config/cors.php';
 
         if (!($config['enabled'] ?? true)) {
-            return;
+            return null;
         }
 
         $response = new Response();
@@ -42,8 +42,9 @@ class CorsMiddleware
         }
 
         if ($request->method() === 'OPTIONS') {
-            $response->send('', HttpStatus::NO_CONTENT);
-            return;
+            return $response->setStatus(HttpStatus::NO_CONTENT);
         }
+
+        return null;
     }
 }

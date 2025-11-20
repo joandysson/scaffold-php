@@ -9,17 +9,16 @@ use App\Config\Response\Response;
 
 class BasicAuthMiddleware
 {
-    public function __invoke(Request $request): void
+    public function __invoke(Request $request): ?Response
     {
         $username = getenv('SWAGGER_USERNAME') ?: null;
         $password = getenv('SWAGGER_PASSWORD') ?: null;
 
         if ($username === null || $password === null) {
-            (new Response())->send(
-                'Swagger credentials are not configured.',
+            return (new Response())->json(
+                ['error' => 'Swagger credentials are not configured.'],
                 HttpStatus::INTERNAL_SERVER_ERROR
             );
-            exit;
         }
 
         $providedUser = $_SERVER['PHP_AUTH_USER'] ?? null;
@@ -27,8 +26,9 @@ class BasicAuthMiddleware
 
         if ($providedUser !== $username || $providedPassword !== $password) {
             header('WWW-Authenticate: Basic realm="Swagger Documentation"');
-            (new Response())->send('Authentication required.', HttpStatus::UNAUTHORIZED);
-            exit;
+            return (new Response())->json(['error' => 'Authentication required.'], HttpStatus::UNAUTHORIZED);
         }
+
+        return null;
     }
 }

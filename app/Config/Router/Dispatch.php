@@ -94,7 +94,11 @@ abstract class Dispatch
                     $request->setRouteParams(self::$route['data'] ?? []);
                 }
                 foreach (self::middlewaresForRoute() as $middleware) {
-                    $middleware($request);
+                    $middlewareResult = $middleware($request);
+                    if ($middlewareResult instanceof Response) {
+                        $middlewareResult->send();
+                        return true;
+                    }
                 }
                 $result = call_user_func_array(self::$route['handler'], $params);
                 return self::emit($result);
@@ -128,7 +132,11 @@ abstract class Dispatch
                 $request->setRouteParams(self::$route['data'] ?? []);
             }
             foreach (self::middlewaresForRoute() as $middleware) {
-                $middleware($request);
+                $middlewareResult = $middleware($request);
+                if ($middlewareResult instanceof Response) {
+                    $middlewareResult->send();
+                    return true;
+                }
             }
             $result = $newController->$method(...$params);
             return self::emit($result);
