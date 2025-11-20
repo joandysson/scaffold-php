@@ -5,6 +5,8 @@ use App\Config\Request\Request;
 use App\Config\Response\HttpStatus;
 use App\Config\Response\Response;
 use App\Middleware\SwaggerAuthMiddleware;
+use OpenApi\Generator;
+use Throwable;
 
 // Middlewares are executed before each matched route.
 // Register them using Router::addMiddleware().
@@ -37,29 +39,12 @@ Router::get('/health', 'HealthController:show');
 Router::get('/swagger.json', function (Request $request) {
     (new SwaggerAuthMiddleware())($request);
 
-    $swaggerPath = __DIR__ . '/../docs/swagger.json';
-
-    if (!is_file($swaggerPath)) {
+    try {
+        $openApi = Generator::scan([__DIR__ . '/../app']);
+        $spec = json_decode($openApi->toJson(), true, 512, JSON_THROW_ON_ERROR);
+    } catch (Throwable $exception) {
         return (new Response())->json(
-            ['error' => 'Swagger document not found.'],
-            HttpStatus::INTERNAL_SERVER_ERROR
-        );
-    }
-
-    $contents = file_get_contents($swaggerPath);
-
-    if ($contents === false) {
-        return (new Response())->json(
-            ['error' => 'Unable to load Swagger document.'],
-            HttpStatus::INTERNAL_SERVER_ERROR
-        );
-    }
-
-    $spec = json_decode($contents, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return (new Response())->json(
-            ['error' => 'Swagger document is invalid JSON.'],
+            ['error' => 'Failed to generate Swagger document.'],
             HttpStatus::INTERNAL_SERVER_ERROR
         );
     }
