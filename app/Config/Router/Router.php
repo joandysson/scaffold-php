@@ -18,10 +18,13 @@ class Router extends Dispatch
     /** @var array<int, callable> */
     private static array $groupMiddlewares = [];
 
-    public function __construct()
+    public function __construct(bool $boot = true)
     {
         parent::__construct();
-        self::init();
+
+        if ($boot) {
+            self::init();
+        }
     }
 
     public static function init(): void
@@ -41,7 +44,7 @@ class Router extends Dispatch
         self::$prefix = $groupPrefix;
 
         try {
-            $callback(new RouterGroupContext());
+            $callback(new self(false));
         } finally {
             self::$prefix = $previousPrefix;
         }
@@ -301,12 +304,5 @@ class Router extends Dispatch
         }
 
         return $route;
-    }
-}
-
-class RouterGroupContext extends Router
-{
-    public function __construct()
-    {
     }
 }

@@ -54,7 +54,7 @@ class RouteMiddlewareRegistrar
             Router::setGroupMiddlewares($groupMiddlewares);
 
             try {
-                $callbackOrPrefix(new RouterGroupContext());
+                $callbackOrPrefix(new Router(false));
             } finally {
                 Router::setGroupMiddlewares($previousGroupMiddlewares);
             }
@@ -68,7 +68,7 @@ class RouteMiddlewareRegistrar
                 Router::setGroupMiddlewares($groupMiddlewares);
 
                 try {
-                    $callback(new RouterGroupContext());
+                    $callback(new Router(false));
                 } finally {
                     Router::setGroupMiddlewares($previousGroupMiddlewares);
                 }
