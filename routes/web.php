@@ -13,8 +13,10 @@ use App\Middleware\BasicAuthMiddleware;
 //     // Authentication or logging logic
 // });
 
-// Uncomment to prefix all routes with a base path
-// Router::prefix('/api/v1');
+// Grouping routes under a base path
+// Router::group('/api/v1', function (Router $router) {
+//     $router->get('/status', 'HealthController:show');
+// });
 // Basic GET route using a controller action
 Router::get('/', 'HomeController:home');
 
@@ -26,6 +28,17 @@ Router::get('/hello/{name}', function (Request $request) {
     $params = $request->getRouteParams();
     echo "Hello {$params['name']}";
 });
+
+// Grouping routes that share middleware
+// Router::middleware([BasicAuthMiddleware::class])->group(function (Router $router) {
+//     $router->get('/admin', 'AdminController:index');
+//     $router->post('/admin/posts', 'AdminController:create');
+// });
+// With a path prefix applied to every route in the group
+// Router::middleware([BasicAuthMiddleware::class])->group('/api/v2', function (Router $router) {
+//     $router->get('/posts', 'Api\\PostController:index');
+//     $router->post('/posts', 'Api\\PostController:create');
+// });
 
 // POST route example
 Router::post('/submit', function () {

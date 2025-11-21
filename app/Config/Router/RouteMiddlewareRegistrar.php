@@ -41,4 +41,38 @@ class RouteMiddlewareRegistrar
     {
         Router::delete($route, $handler, $name, $this->middlewares);
     }
+
+    /**
+     * Group multiple routes under the same middleware stack.
+     */
+    public function group(callable|string $callbackOrPrefix, ?callable $callback = null): void
+    {
+        $previousGroupMiddlewares = Router::getGroupMiddlewares();
+        $groupMiddlewares = array_merge($previousGroupMiddlewares, $this->middlewares);
+
+        if ($callback === null) {
+            Router::setGroupMiddlewares($groupMiddlewares);
+
+            try {
+                $callbackOrPrefix(new RouterGroupContext());
+            } finally {
+                Router::setGroupMiddlewares($previousGroupMiddlewares);
+            }
+
+            return;
+        }
+
+        Router::group(
+            $callbackOrPrefix,
+            function () use ($callback, $groupMiddlewares, $previousGroupMiddlewares): void {
+                Router::setGroupMiddlewares($groupMiddlewares);
+
+                try {
+                    $callback(new RouterGroupContext());
+                } finally {
+                    Router::setGroupMiddlewares($previousGroupMiddlewares);
+                }
+            }
+        );
+    }
 }

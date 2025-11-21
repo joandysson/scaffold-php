@@ -15,6 +15,8 @@ class Router extends Dispatch
     private static string $namespace = 'App\Controller';
 
     private static string $prefix = '';
+    /** @var array<int, callable> */
+    private static array $groupMiddlewares = [];
 
     public function __construct()
     {
@@ -27,9 +29,45 @@ class Router extends Dispatch
         require_once dirname(__DIR__) . '../../../routes/web.php';
     }
 
-    public static function prefix(string $prefix = ''): void
+    public static function group(?string $prefix = null, ?callable $callback = null): ?string
     {
-        self::$prefix = $prefix;
+        if ($callback === null) {
+            return parent::group($prefix);
+        }
+
+        $previousPrefix = self::$prefix;
+        $groupPrefix = $previousPrefix . ($prefix ?? '');
+
+        self::$prefix = $groupPrefix;
+
+        try {
+            $callback(new RouterGroupContext());
+        } finally {
+            self::$prefix = $previousPrefix;
+        }
+
+        return null;
+    }
+
+    public static function getPrefix(): string
+    {
+        return self::$prefix;
+    }
+
+    /**
+     * @return array<int, callable>
+     */
+    public static function getGroupMiddlewares(): array
+    {
+        return self::$groupMiddlewares;
+    }
+
+    /**
+     * @param array<int, callable|string> $middlewares
+     */
+    public static function setGroupMiddlewares(array $middlewares): void
+    {
+        self::$groupMiddlewares = array_map([self::class, 'normalizeMiddleware'], $middlewares);
     }
 
     /**
@@ -128,8 +166,21 @@ class Router extends Dispatch
 
         $data = $params;
 
+        $normalizedMiddlewares = array_map(
+            [self::class, 'normalizeMiddleware'],
+            array_merge(self::$groupMiddlewares, $middlewares)
+        );
+
         $namespace = self::$namespace;
-        $router = function () use ($method, $handler, $data, $route, $name, $namespace, $middlewares) {
+        $router = function () use (
+            $method,
+            $handler,
+            $data,
+            $route,
+            $name,
+            $namespace,
+            $normalizedMiddlewares
+        ) {
             return [
                 'route' => $route,
                 'name' => $name,
@@ -137,7 +188,7 @@ class Router extends Dispatch
                 'handler' => self::handler($handler, $namespace),
                 'action' => self::action($handler),
                 'data' => $data,
-                'middlewares' => array_map([self::class, 'normalizeMiddleware'], $middlewares)
+                'middlewares' => $normalizedMiddlewares
             ];
         };
 
@@ -250,5 +301,12 @@ class Router extends Dispatch
         }
 
         return $route;
+    }
+}
+
+class RouterGroupContext extends Router
+{
+    public function __construct()
+    {
     }
 }
