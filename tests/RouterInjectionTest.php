@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller {
-    use App\Config\Request\Request;
+    use Config\Request\Request;
 
     class DummyInjectionController
     {
@@ -15,9 +15,9 @@ namespace App\Controller {
 namespace {
     require_once __DIR__ . '/../config/functions.php';
     use PHPUnit\Framework\TestCase;
-    use App\Config\Router\Router;
-    use App\Config\Router\Dispatch;
-    use App\Config\Request\Request;
+    use Config\Router\Router;
+    use Config\Router\Dispatch;
+    use Config\Request\Request;
     use App\Controller\DummyInjectionController;
 
     class RouterInjectionTest extends TestCase

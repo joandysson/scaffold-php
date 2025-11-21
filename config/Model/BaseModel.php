@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Model;
+namespace Config\Model;
 
-use App\Config\Database\Connection;
+use Config\Database\Connection;
 use PDO;
 
 /**
  * class BaseModel
- * @package App\Config\Model
+ * @package Config\Model
  */
 abstract class BaseModel extends Connection
 {

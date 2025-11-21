@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use PHPUnit\Framework\TestCase;
-use App\Config\Router\Router;
-use App\Config\Router\Dispatch;
+use Config\Router\Router;
+use Config\Router\Dispatch;
 
 class RouterExceptionTest extends TestCase
 {

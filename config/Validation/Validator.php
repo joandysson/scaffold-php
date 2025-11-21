@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Validation;
+namespace Config\Validation;
 
 class Validator
 {

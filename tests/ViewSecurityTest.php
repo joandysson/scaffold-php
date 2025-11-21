@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use PHPUnit\Framework\TestCase;
-use App\Config\Response\Response;
+use Config\Response\Response;
 
 class ViewSecurityTest extends TestCase
 {

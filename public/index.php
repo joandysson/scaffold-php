@@ -1,9 +1,9 @@
 <?php
 
-use App\Config\Router\Router;
+use Config\Router\Router;
 use function Sentry\captureException;
 use function Sentry\init;
-use App\Config\Log\Log;
+use Config\Log\Log;
 
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'functions.php';
@@ -11,7 +11,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPAR
 // Load container bindings and register them for dependency injection.
 $bindings = require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'bindings.php';
 foreach ($bindings as $abstract => $concrete) {
-    \App\Config\Container\Container::set($abstract, $concrete);
+    \Config\Container\Container::set($abstract, $concrete);
 }
 
 $dotenv = Dotenv\Dotenv::createUnsafeImmutable(dirname(__DIR__));

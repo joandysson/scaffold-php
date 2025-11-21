@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Config\Response\Response;
-use App\Config\Response\HttpStatus;
+use Config\Response\Response;
+use Config\Response\HttpStatus;
 use OpenApi\Attributes as OA;
 
 class HealthController

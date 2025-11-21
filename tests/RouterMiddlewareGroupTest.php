@@ -2,10 +2,10 @@
 
 require_once __DIR__ . '/../config/functions.php';
 
-use App\Config\Request\Request;
-use App\Config\Response\Response;
-use App\Config\Router\Dispatch;
-use App\Config\Router\Router;
+use Config\Request\Request;
+use Config\Response\Response;
+use Config\Router\Dispatch;
+use Config\Router\Router;
 use PHPUnit\Framework\TestCase;
 
 class RouterMiddlewareGroupTest extends TestCase

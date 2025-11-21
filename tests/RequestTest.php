@@ -2,9 +2,9 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use PHPUnit\Framework\TestCase;
-use App\Config\Request\Request;
-use App\Config\Response\Response;
-use App\Config\Response\HttpStatus;
+use Config\Request\Request;
+use Config\Response\Response;
+use Config\Response\HttpStatus;
 
 class RequestTest extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Request;
+namespace Config\Request;
 
-use App\Config\Validation\Validator;
+use Config\Validation\Validator;
 use BadMethodCallException;
 
 class Request

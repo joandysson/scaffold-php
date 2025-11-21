@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Router;
+namespace Config\Router;
 
 class URL
 {

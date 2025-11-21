@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Config\Request\Request;
+use Config\Request\Request;
 
 class HomeController
 {
     public function home(Request $request): void
     {
         echo "Welcome to the Home Page!\n";
-        // (new \App\Config\Response\Response())->view(
+        // (new \Config\Response\Response())->view(
         //     'home',
         //     [
         //         'data' => \$data

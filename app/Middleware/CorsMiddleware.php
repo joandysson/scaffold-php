@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Config\Request\Request;
-use App\Config\Response\HttpStatus;
-use App\Config\Response\Response;
+use Config\Request\Request;
+use Config\Response\HttpStatus;
+use Config\Response\Response;
 
 class CorsMiddleware
 {
