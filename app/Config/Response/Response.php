@@ -4,16 +4,41 @@ declare(strict_types=1);
 namespace App\Config\Response;
 
 use App\Config\Response\HttpStatus;
-use RuntimeException;
 use BadMethodCallException;
+use RuntimeException;
 
+/**
+ * @method Response setStatus(int|HttpStatus $status)
+ * @method Response addHeader(string $name, string $value)
+ * @method Response json(array $data, int|HttpStatus $status = HttpStatus::OK)
+ * @method Response view(string $view, array $data = [], int|HttpStatus $status = HttpStatus::OK)
+ * @method void send(?string $content = null, int|HttpStatus $status = HttpStatus::OK)
+ * @method int getStatus()
+ * @method array getHeaders()
+ * @method static Response setStatus(int|HttpStatus $status)
+ * @method static Response addHeader(string $name, string $value)
+ * @method static Response json(array $data, int|HttpStatus $status = HttpStatus::OK)
+ * @method static Response view(string $view, array $data = [], int|HttpStatus $status = HttpStatus::OK)
+ * @method static void send(?string $content = null, int|HttpStatus $status = HttpStatus::OK)
+ * @method static int getStatus()
+ * @method static array getHeaders()
+ */
 class Response
 {
     private int $status = HttpStatus::OK->value;
     private array $headers = [];
     private string $content = '';
 
-    public function setStatus(int|HttpStatus $status): self
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (!method_exists($this, $name)) {
+            throw new BadMethodCallException("Method {$name} not found in " . self::class);
+        }
+
+        return $this->$name(...$arguments);
+    }
+
+    protected function setStatus(int|HttpStatus $status): self
     {
         $code = $status instanceof HttpStatus ? $status->value : $status;
         $this->status = $code;
@@ -21,24 +46,22 @@ class Response
         return $this;
     }
 
-    public function addHeader(string $name, string $value): self
+    protected function addHeader(string $name, string $value): self
     {
         $this->headers[$name] = $value;
         header("$name: $value", true);
         return $this;
     }
 
-    public function json(
-        array $data,
-        int|HttpStatus $status = HttpStatus::OK
-    ): self {
+    protected function json(array $data, int|HttpStatus $status = HttpStatus::OK): self
+    {
         $this->setStatus($status);
         $this->addHeader('Content-Type', 'application/json');
         $this->content = json_encode($data);
         return $this;
     }
 
-    public function view(
+    protected function view(
         string $view,
         array $data = [],
         int|HttpStatus $status = HttpStatus::OK
@@ -72,7 +95,7 @@ class Response
         return $this;
     }
 
-    public function send(?string $content = null, int|HttpStatus $status = null): void
+    protected function send(?string $content = null, int|HttpStatus $status = HttpStatus::OK): void
     {
         if ($content !== null) {
             $this->content = $content;
@@ -83,23 +106,22 @@ class Response
         echo $this->content;
     }
 
-    public function getStatus(): int
+    protected function getStatus(): int
     {
         return $this->status;
     }
 
-    public function getHeaders(): array
+    protected function getHeaders(): array
     {
         return $this->headers;
     }
 
     public static function __callStatic(string $name, array $arguments): mixed
     {
-        $instance = new self();
-        if (method_exists($instance, $name)) {
-            return $instance->$name(...$arguments);
+        $instance = new static();
+        if (!method_exists($instance, $name)) {
+            throw new BadMethodCallException("Method {$name} not found in " . self::class);
         }
-
-        throw new BadMethodCallException("Method {$name} not found in " . self::class);
+        return $instance->$name(...$arguments);
     }
 }
