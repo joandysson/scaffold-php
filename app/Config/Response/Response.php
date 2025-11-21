@@ -28,8 +28,10 @@ class Response
         return $this;
     }
 
-    public function json(array $data, int|HttpStatus $status = HttpStatus::OK): self
-    {
+    public function json(
+        array $data,
+        int|HttpStatus $status = HttpStatus::OK
+    ): self {
         $this->setStatus($status);
         $this->addHeader('Content-Type', 'application/json');
         $this->content = json_encode($data);
@@ -94,9 +96,10 @@ class Response
     public static function __callStatic(string $name, array $arguments): mixed
     {
         $instance = new self();
-        if (!method_exists($instance, $name)) {
-            throw new BadMethodCallException("Method {$name} not found in " . self::class);
+        if (method_exists($instance, $name)) {
+            return $instance->$name(...$arguments);
         }
-        return $instance->$name(...$arguments);
+
+        throw new BadMethodCallException("Method {$name} not found in " . self::class);
     }
 }
