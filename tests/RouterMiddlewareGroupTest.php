@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../app/Config/functions.php';
+require_once __DIR__ . '/../config/functions.php';
 
 use App\Config\Request\Request;
 use App\Config\Response\Response;

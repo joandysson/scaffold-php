@@ -111,7 +111,7 @@ anotações e sobrescreve o arquivo de especificação utilizado pelo Swagger UI
 
 ### Tarefas agendadas
 
-Tarefas de cron são registradas no arquivo `app/Config/cron.php`. Para executar
+Tarefas de cron são registradas no arquivo `config/cron.php`. Para executar
 uma delas manualmente utilize:
 
 ```sh
@@ -119,7 +119,7 @@ php run-cron.php NomeDaTarefa
 ```
 
 O script `cron.sh` é um facilitador que pode ser utilizado em servidores para
-agendar execuções recorrentes. Edite `app/Config/cron.php` para adicionar novas
+agendar execuções recorrentes. Edite `config/cron.php` para adicionar novas
 tarefas ou ajustar a periodicidade das existentes. Logs das execuções são salvos
 em `storage/logs/cron.log` quando `LOG_DRIVER` estiver configurado como `file`.
 
@@ -157,7 +157,7 @@ Router::post('/users', function (App\Config\Request\Request $req) {
 
 #### Tarefas de cron personalizadas
 
-Crie classes que implementem `App\Cron\CronInterface` e registre-as em `app/Config/cron.php`:
+Crie classes que implementem `App\Cron\CronInterface` e registre-as em `config/cron.php`:
 
 ```php
 class CleanupCron implements App\Cron\CronInterface

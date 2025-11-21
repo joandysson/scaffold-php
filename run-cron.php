@@ -5,13 +5,13 @@ use App\Cron\CronRunner;
 use Dotenv\Dotenv;
 
 require_once 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-require_once 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
+require_once 'config' . DIRECTORY_SEPARATOR . 'functions.php';
 
 $dotenv = Dotenv::createUnsafeImmutable('.');
 $dotenv->load();
 
 $runner = new CronRunner();
-$tasks = require 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'cron.php';
+$tasks = require 'config' . DIRECTORY_SEPARATOR . 'cron.php';
 
 $task = $argv[1] ?? null;
 

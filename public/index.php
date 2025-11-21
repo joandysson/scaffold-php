@@ -6,10 +6,10 @@ use function Sentry\init;
 use App\Config\Log\Log;
 
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'functions.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'functions.php';
 
 // Load container bindings and register them for dependency injection.
-$bindings = require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'bindings.php';
+$bindings = require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'bindings.php';
 foreach ($bindings as $abstract => $concrete) {
     \App\Config\Container\Container::set($abstract, $concrete);
 }
@@ -29,8 +29,8 @@ if (getenv('APP_STAGE') === 'PROD') {
 
 errorReporting(getenv('APP_DEBUG') === 'true');
 
-// Register global middlewares listed in app/Config/middleware.php.
-$middlewares = require dirname(__DIR__) . '/app/Config/middleware.php';
+// Register global middlewares listed in config/middleware.php.
+$middlewares = require dirname(__DIR__) . '/config/middleware.php';
 foreach ($middlewares as $middleware) {
     Router::addMiddleware(new $middleware());
 }
