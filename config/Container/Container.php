@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Container;
+namespace Config\Container;
 
 use Closure;
 use ReflectionClass;

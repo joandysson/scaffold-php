@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Config\Model\BaseModel;
+use Config\Model\BaseModel;
 
 /**
  * @package App\Model

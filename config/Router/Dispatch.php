@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Router;
+namespace Config\Router;
 
-use App\Config\Response\HttpStatus;
-use App\Config\Response\Response;
-use App\Config\Request\Request;
+use Config\Response\HttpStatus;
+use Config\Response\Response;
+use Config\Request\Request;
 use RuntimeException;
 
 abstract class Dispatch

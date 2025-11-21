@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use PHPUnit\Framework\TestCase;
-use App\Config\Container\Container;
-use App\Config\Request\Request;
+use Config\Container\Container;
+use Config\Request\Request;
 
 class Service {}
 class Dependency {}

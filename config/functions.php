@@ -184,7 +184,7 @@ function section(Closure $fun): string {
 function make(callable|string $callable, array $routeParams = []): array|object
 {
     if (is_string($callable) && class_exists($callable)) {
-        return \App\Config\Container\Container::get($callable);
+        return \Config\Container\Container::get($callable);
     }
 
     $parameters = [];
@@ -200,8 +200,8 @@ function make(callable|string $callable, array $routeParams = []): array|object
         if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
             $className = $type->getName();
             if (class_exists($className) || interface_exists($className)) {
-                $object = \App\Config\Container\Container::get($className);
-                if ($object instanceof \App\Config\Request\Request) {
+                $object = \Config\Container\Container::get($className);
+                if ($object instanceof \Config\Request\Request) {
                     $object->setRouteParams($routeParams);
                 }
                 $parameters[] = $object;

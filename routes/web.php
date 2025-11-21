@@ -1,9 +1,9 @@
 <?php
 
-use App\Config\Router\Router;
-use App\Config\Request\Request;
-use App\Config\Response\HttpStatus;
-use App\Config\Response\Response;
+use Config\Router\Router;
+use Config\Request\Request;
+use Config\Response\HttpStatus;
+use Config\Response\Response;
 use App\Middleware\BasicAuthMiddleware;
 
 // Middlewares are executed before each matched route.

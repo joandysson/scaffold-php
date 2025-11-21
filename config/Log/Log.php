@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Log;
+namespace Config\Log;
 
 class Log
 {

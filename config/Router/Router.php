@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Config\Router;
+namespace Config\Router;
 
 use Closure;
-use App\Config\Response\HttpStatus;
+use Config\Response\HttpStatus;
 
 class Router extends Dispatch
 {

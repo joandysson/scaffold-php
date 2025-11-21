@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use PHPUnit\Framework\TestCase;
-use App\Config\Model\BaseModel;
+use Config\Model\BaseModel;
 
 class TestModel extends BaseModel
 {

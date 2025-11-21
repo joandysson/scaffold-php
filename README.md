@@ -44,7 +44,7 @@ Há chaves extras como `SAFE_BROWSING_URL` que servem como exemplo para integra�
 O roteador oferece uma sintaxe simples para registrar rotas. No arquivo `routes/web.php` você pode declarar rotas apontando para controladores ou funções anônimas:
 
 ```php
-use App\Config\Router\Router;
+use Config\Router\Router;
 
 Router::get('/', 'HomeController:home');
 Router::get('/blog/{id}', 'HomeController:blog');
@@ -135,7 +135,7 @@ ser mockados normalmente através das ferramentas do PHPUnit.
 #### Controller e middleware
 
 ```php
-use App\Config\Router\Router;
+use Config\Router\Router;
 
 // Middleware simples
 Router::addMiddleware(function ($request) {
@@ -143,13 +143,13 @@ Router::addMiddleware(function ($request) {
 });
 
 // Controller com validação
-Router::post('/users', function (App\Config\Request\Request $req) {
+Router::post('/users', function (Config\Request\Request $req) {
     $errors = $req->validate([
         'email' => 'required|email',
         'name' => 'required'
     ]);
     if ($errors) {
-        return (new App\Config\Response\Response())->json(['errors' => $errors], App\Config\Response\HttpStatus::BAD_REQUEST);
+        return (new Config\Response\Response())->json(['errors' => $errors], Config\Response\HttpStatus::BAD_REQUEST);
     }
     echo 'Usuário criado';
 });
@@ -182,7 +182,7 @@ Execute `php run-cron.php cleanup` para rodar manualmente.
 Modelos podem estender `BaseModel` para usar métodos auxiliares de query:
 
 ```php
-class User extends App\Config\Model\BaseModel
+class User extends Config\Model\BaseModel
 {
     public function create(array $data): int|bool
     {
