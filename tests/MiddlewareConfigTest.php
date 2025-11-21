@@ -7,7 +7,7 @@ namespace {
     {
         public function testCorsMiddlewareIncludedByDefault(): void
         {
-            $middlewares = require __DIR__ . '/../app/Config/middleware.php';
+            $middlewares = require __DIR__ . '/../config/middleware.php';
             $this->assertContains(CorsMiddleware::class, $middlewares);
         }
     }

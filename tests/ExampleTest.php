@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../app/Config/functions.php";
+require_once __DIR__ . "/../config/functions.php";
 use PHPUnit\Framework\TestCase;
 
 class ExampleTest extends TestCase

@@ -13,7 +13,7 @@ namespace App\Controller {
 }
 
 namespace {
-    require_once __DIR__ . '/../app/Config/functions.php';
+    require_once __DIR__ . '/../config/functions.php';
     use PHPUnit\Framework\TestCase;
     use App\Config\Router\Router;
     use App\Config\Router\Dispatch;
