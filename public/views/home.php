@@ -10,4 +10,4 @@ $description = 'Sample home page';
 <?php }); ?>
 
 <?php // Include the main template which loads header and footer layouts ?>
-<?php include 'templates/main.php'; ?>
+<?php include __DIR__ . '/templates/main.php'; ?>

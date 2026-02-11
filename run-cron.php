@@ -4,14 +4,16 @@ declare(strict_types=1);
 use App\Cron\CronRunner;
 use Dotenv\Dotenv;
 
-require_once 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-require_once 'config' . DIRECTORY_SEPARATOR . 'functions.php';
+$basePath = __DIR__;
 
-$dotenv = Dotenv::createUnsafeImmutable('.');
+require_once $basePath . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once $basePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'functions.php';
+
+$dotenv = Dotenv::createUnsafeImmutable($basePath);
 $dotenv->load();
 
 $runner = new CronRunner();
-$tasks = require 'config' . DIRECTORY_SEPARATOR . 'cron.php';
+$tasks = require $basePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'cron.php';
 
 $task = $argv[1] ?? null;
 
