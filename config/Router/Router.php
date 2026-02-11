@@ -29,7 +29,7 @@ class Router extends Dispatch
 
     public static function init(): void
     {
-        require_once dirname(__DIR__) . '../../../routes/web.php';
+        require_once dirname(__DIR__, 2) . '/routes/web.php';
     }
 
     public static function group(?string $prefix = null, ?callable $callback = null): ?string
