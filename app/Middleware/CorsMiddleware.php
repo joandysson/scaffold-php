@@ -11,7 +11,7 @@ class CorsMiddleware
 {
     public function __invoke(Request $request): ?Response
     {
-        $config = require dirname(__DIR__) . '/Config/cors.php';
+        $config = require dirname(__DIR__, 2) . '/config/cors.php';
 
         if (!($config['enabled'] ?? true)) {
             return null;
