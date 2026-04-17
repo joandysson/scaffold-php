@@ -26,8 +26,10 @@ services:
     app:
         image: scaffold-php-app
         build:
-            context: ./docker/php/
+            context: .
+            dockerfile: docker/php/Dockerfile
             args:
+                APP_STAGE: ${APP_STAGE}
                 XDEBUG_MODE: ${XDEBUG_MODE}
                 XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST}
                 XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST}
@@ -42,6 +44,7 @@ services:
         ports:
             - "80:80"
         environment:
+            APP_STAGE: ${APP_STAGE}
             APP_URL: ${APP_URL}
             DB_DRIVER: ${DB_DRIVER}
             DB_NAME: ${DB_NAME}
