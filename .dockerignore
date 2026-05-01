@@ -1,9 +1,11 @@
 .git
+.github/
+.agents/
+.specify/
 vendor/
 node_modules/
 Dockerfile
 docker-compose.yml
-docker/
 storage/
-tests/
 .env
+AGENTS.md
