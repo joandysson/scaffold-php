@@ -7,6 +7,7 @@ ARG XDEBUG_CLIENT_HOST
 ARG XDEBUG_CLIENT_PORT
 
 ENV APP_STAGE=${APP_STAGE}
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install required packages and PHP extensions
 RUN set -eux; \
