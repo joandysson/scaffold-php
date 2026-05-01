@@ -64,6 +64,9 @@ while [ $i -le $# ]; do
             echo "  --timestamp         Use timestamp prefix (YYYYMMDD-HHMMSS) instead of sequential numbering"
             echo "  --help, -h          Show this help message"
             echo ""
+            echo "Environment variables:"
+            echo "  SPECIFY_BRANCH_PREFIX  Branch namespace: feature, fix, release, or hotfix"
+            echo ""
             echo "Examples:"
             echo "  $0 'Add user authentication system' --short-name 'user-auth'"
             echo "  $0 'Implement OAuth2 integration for API' --number 5"
@@ -118,12 +121,25 @@ get_highest_from_branches() {
     git branch -a 2>/dev/null | sed 's/^[* ]*//; s|^remotes/[^/]*/||' | _extract_highest_number
 }
 
+_effective_numbered_name() {
+    local name="$1"
+    case "$name" in
+        feature/*|fix/*|release/*|hotfix/*)
+            printf '%s\n' "${name#*/}"
+            ;;
+        *)
+            printf '%s\n' "$name"
+            ;;
+    esac
+}
+
 # Extract the highest sequential feature number from a list of ref names (one per line).
 # Shared by get_highest_from_branches and get_highest_from_remote_refs.
 _extract_highest_number() {
     local highest=0
     while IFS= read -r name; do
         [ -z "$name" ] && continue
+        name=$(_effective_numbered_name "$name")
         if echo "$name" | grep -Eq '^[0-9]{3,}-' && ! echo "$name" | grep -Eq '^[0-9]{8}-[0-9]{6}-'; then
             number=$(echo "$name" | grep -Eo '^[0-9]+' || echo "0")
             number=$((10#$number))
@@ -187,6 +203,16 @@ clean_branch_name() {
     local name="$1"
     echo "$name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\+/-/g' | sed 's/^-//' | sed 's/-$//'
 }
+
+BRANCH_TYPE_PREFIX="${SPECIFY_BRANCH_PREFIX:-feature}"
+BRANCH_TYPE_PREFIX="${BRANCH_TYPE_PREFIX%/}"
+case "$BRANCH_TYPE_PREFIX" in
+    feature|fix|release|hotfix) ;;
+    *)
+        echo "Error: SPECIFY_BRANCH_PREFIX must be feature, fix, release, or hotfix" >&2
+        exit 1
+        ;;
+esac
 
 # Resolve repository root using common.sh functions which prioritize .specify over git
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -274,7 +300,8 @@ fi
 # Determine branch prefix
 if [ "$USE_TIMESTAMP" = true ]; then
     FEATURE_NUM=$(date +%Y%m%d-%H%M%S)
-    BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    FEATURE_DIR_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    BRANCH_NAME="${BRANCH_TYPE_PREFIX}/${FEATURE_DIR_NAME}"
 else
     # Determine branch number
     if [ -z "$BRANCH_NUMBER" ]; then
@@ -297,7 +324,8 @@ else
 
     # Force base-10 interpretation to prevent octal conversion (e.g., 010 → 8 in octal, but should be 10 in decimal)
     FEATURE_NUM=$(printf "%03d" "$((10#$BRANCH_NUMBER))")
-    BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    FEATURE_DIR_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    BRANCH_NAME="${BRANCH_TYPE_PREFIX}/${FEATURE_DIR_NAME}"
 fi
 
 # GitHub enforces a 244-byte limit on branch names
@@ -306,7 +334,7 @@ MAX_BRANCH_LENGTH=244
 if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     # Calculate how much we need to trim from suffix
     # Account for prefix length: timestamp (15) + hyphen (1) = 16, or sequential (3) + hyphen (1) = 4
-    PREFIX_LENGTH=$(( ${#FEATURE_NUM} + 1 ))
+    PREFIX_LENGTH=$(( ${#BRANCH_TYPE_PREFIX} + 1 + ${#FEATURE_NUM} + 1 ))
     MAX_SUFFIX_LENGTH=$((MAX_BRANCH_LENGTH - PREFIX_LENGTH))
     
     # Truncate suffix at word boundary if possible
@@ -315,14 +343,15 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     TRUNCATED_SUFFIX=$(echo "$TRUNCATED_SUFFIX" | sed 's/-$//')
     
     ORIGINAL_BRANCH_NAME="$BRANCH_NAME"
-    BRANCH_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
+    FEATURE_DIR_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
+    BRANCH_NAME="${BRANCH_TYPE_PREFIX}/${FEATURE_DIR_NAME}"
     
     >&2 echo "[specify] Warning: Branch name exceeded GitHub's 244-byte limit"
     >&2 echo "[specify] Original: $ORIGINAL_BRANCH_NAME (${#ORIGINAL_BRANCH_NAME} bytes)"
     >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
+FEATURE_DIR="$SPECS_DIR/${FEATURE_DIR_NAME:-$BRANCH_NAME}"
 SPEC_FILE="$FEATURE_DIR/spec.md"
 
 if [ "$DRY_RUN" != true ]; then

@@ -9,7 +9,7 @@ workflow:
 requires:
   speckit_version: ">=0.6.1"
   integrations:
-    any: ["copilot", "claude", "gemini"]
+    any: ["codex", "copilot", "claude", "gemini"]
 
 inputs:
   feature_name:
@@ -18,8 +18,8 @@ inputs:
     prompt: "Feature name"
   integration:
     type: string
-    default: "copilot"
-    prompt: "Integration to use (e.g. claude, copilot, gemini)"
+    default: "codex"
+    prompt: "Integration to use (e.g. codex, claude, copilot, gemini)"
   scope:
     type: string
     default: "full"

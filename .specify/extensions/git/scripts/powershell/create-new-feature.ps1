@@ -32,6 +32,7 @@ if ($Help) {
     Write-Host ""
     Write-Host "Environment variables:"
     Write-Host "  GIT_BRANCH_NAME     Use this exact branch name, bypassing all prefix/suffix generation"
+    Write-Host "  SPECIFY_BRANCH_PREFIX  Branch namespace: feature, fix, release, or hotfix"
     Write-Host ""
     exit 0
 }
@@ -70,6 +71,9 @@ function Get-HighestNumberFromNames {
 
     [long]$highest = 0
     foreach ($name in $Names) {
+        if ($name -match '^(feature|fix|release|hotfix)/(.+)$') {
+            $name = $matches[2]
+        }
         if ($name -match '^(\d{3,})-' -and $name -notmatch '^\d{8}-\d{6}-') {
             [long]$num = 0
             if ([long]::TryParse($matches[1], [ref]$num) -and $num -gt $highest) {
@@ -146,6 +150,11 @@ function Get-NextBranchNumber {
 function ConvertTo-CleanBranchName {
     param([string]$Name)
     return $Name.ToLower() -replace '[^a-z0-9]', '-' -replace '-{2,}', '-' -replace '^-', '' -replace '-$', ''
+}
+
+$branchTypePrefix = if ($env:SPECIFY_BRANCH_PREFIX) { $env:SPECIFY_BRANCH_PREFIX.TrimEnd('/') } else { 'feature' }
+if (@('feature', 'fix', 'release', 'hotfix') -notcontains $branchTypePrefix) {
+    throw "SPECIFY_BRANCH_PREFIX must be feature, fix, release, or hotfix"
 }
 
 # ---------------------------------------------------------------------------
@@ -270,6 +279,10 @@ if ($env:GIT_BRANCH_NAME) {
     # Check timestamp pattern first (YYYYMMDD-HHMMSS-) since it also matches the simpler ^\d+ pattern
     if ($branchName -match '^(\d{8}-\d{6})-') {
         $featureNum = $matches[1]
+    } elseif ($branchName -match '^(?:feature|fix|release|hotfix)/(\d{8}-\d{6})-') {
+        $featureNum = $matches[1]
+    } elseif ($branchName -match '^(?:feature|fix|release|hotfix)/(\d+)-') {
+        $featureNum = $matches[1]
     } elseif ($branchName -match '^(\d+)-') {
         $featureNum = $matches[1]
     } else {
@@ -289,7 +302,8 @@ if ($env:GIT_BRANCH_NAME) {
 
     if ($Timestamp) {
         $featureNum = Get-Date -Format 'yyyyMMdd-HHmmss'
-        $branchName = "$featureNum-$branchSuffix"
+        $featureDirName = "$featureNum-$branchSuffix"
+        $branchName = "$branchTypePrefix/$featureDirName"
     } else {
         if ($Number -eq 0) {
             if ($DryRun -and $hasGit) {
@@ -304,20 +318,22 @@ if ($env:GIT_BRANCH_NAME) {
         }
 
         $featureNum = ('{0:000}' -f $Number)
-        $branchName = "$featureNum-$branchSuffix"
+        $featureDirName = "$featureNum-$branchSuffix"
+        $branchName = "$branchTypePrefix/$featureDirName"
     }
 }
 
 $maxBranchLength = 244
 if ($branchName.Length -gt $maxBranchLength) {
-    $prefixLength = $featureNum.Length + 1
+    $prefixLength = $branchTypePrefix.Length + 1 + $featureNum.Length + 1
     $maxSuffixLength = $maxBranchLength - $prefixLength
 
     $truncatedSuffix = $branchSuffix.Substring(0, [Math]::Min($branchSuffix.Length, $maxSuffixLength))
     $truncatedSuffix = $truncatedSuffix -replace '-$', ''
 
     $originalBranchName = $branchName
-    $branchName = "$featureNum-$truncatedSuffix"
+    $featureDirName = "$featureNum-$truncatedSuffix"
+    $branchName = "$branchTypePrefix/$featureDirName"
 
     Write-Warning "[specify] Branch name exceeded GitHub's 244-byte limit"
     Write-Warning "[specify] Original: $originalBranchName ($($originalBranchName.Length) bytes)"
