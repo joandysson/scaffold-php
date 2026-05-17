@@ -29,7 +29,14 @@ class Router extends Dispatch
 
     public static function init(): void
     {
-        require_once dirname(__DIR__, 2) . '/routes/web.php';
+        self::$dispatchOnRegistration = true;
+
+        try {
+            require_once dirname(__DIR__, 2) . '/routes/web.php';
+        } catch (RouteDispatched) {
+        } finally {
+            self::$dispatchOnRegistration = false;
+        }
     }
 
     public static function group(?string $prefix = null, ?callable $callback = null): ?string
@@ -151,23 +158,17 @@ class Router extends Dispatch
             $route = self::$prefix . ($route === '/' ? '' : $route);
         }
 
-        if ($route == '/') {
-            self::addRoute($method, '', $handler, $name);
-        }
-
-        preg_match_all('~\{\s* ([a-zA-Z_][a-zA-Z0-9_-]*) }~x', $route, $keys, PREG_SET_ORDER);
-        $routeDiff = array_values(array_diff(explode('/', parent::$patch), explode('/', $route)));
-
-        $offset = parent::$group ? 1 : 0;
-        $params = [];
-        foreach ($keys as $key) {
-            $params[$key[1]] = $routeDiff[$offset] ?? null;
-            $offset++;
+        if ($route === '/') {
+            self::addRoute($method, '', $handler, $name, $middlewares);
         }
 
         $route = (!parent::$group ? $route : '/' . parent::$group . "{$route}");
 
-        $data = $params;
+        preg_match_all('~\{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*\}~', $route, $keys, PREG_SET_ORDER);
+        $parameterNames = array_map(
+            static fn (array $key): string => $key[1],
+            $keys
+        );
 
         $normalizedMiddlewares = array_map(
             [self::class, 'normalizeMiddleware'],
@@ -178,11 +179,11 @@ class Router extends Dispatch
         $router = function () use (
             $method,
             $handler,
-            $data,
             $route,
             $name,
             $namespace,
-            $normalizedMiddlewares
+            $normalizedMiddlewares,
+            $parameterNames
         ) {
             return [
                 'route' => $route,
@@ -190,12 +191,21 @@ class Router extends Dispatch
                 'method' => $method,
                 'handler' => self::handler($handler, $namespace),
                 'action' => self::action($handler),
-                'data' => $data,
-                'middlewares' => $normalizedMiddlewares
+                'data' => [],
+                'middlewares' => $normalizedMiddlewares,
+                'parameterNames' => $parameterNames
             ];
         };
 
-        $route = preg_replace('~{([^}]*)}~', '([^/]+)', $route);
+        $route = preg_replace('~\{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*\}~', '([^/]+)', $route);
+
+        if (parent::dispatchDuringRegistration($method, $route, $router())) {
+            throw new RouteDispatched();
+        }
+
+        if (self::$dispatchOnRegistration) {
+            return;
+        }
 
         parent::$routes[$method][$route] = $router();
     }

@@ -19,6 +19,9 @@ abstract class Dispatch
     protected static ?string $group = null;
     protected static ?int $error = null;
     protected static array $middlewares = [];
+    protected static bool $dispatchOnRegistration = false;
+    /** @var array<string, bool> */
+    protected static array $registeredMethods = [];
 
     public const BAD_REQUEST = HttpStatus::BAD_REQUEST->value;
     public const NOT_FOUND = HttpStatus::NOT_FOUND->value;
@@ -62,22 +65,82 @@ abstract class Dispatch
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
         self::$patch = explode('?', $_SERVER['REQUEST_URI'])[0];
 
-        if (empty(self::$routes) || empty(self::$routes[self::$httpMethod])) {
+        if (
+            (empty(self::$routes) || empty(self::$routes[self::$httpMethod]))
+            && empty(self::$registeredMethods[self::$httpMethod])
+        ) {
             self::$error = self::NOT_IMPLEMENTED;
             return false;
         }
 
         self::$route = null;
-        foreach (self::$routes[self::$httpMethod] as $key => $route) {
-            if (preg_match('~^' . $key . '$~', self::$patch)) {
-                self::$route = $route;
+        foreach (self::$routes[self::$httpMethod] ?? [] as $key => $route) {
+            $matches = self::matchesRoute($key);
+            if ($matches === null) {
+                continue;
             }
+
+            self::$route = self::withRouteData($route, $matches);
+            return self::execute();
         }
 
         return self::execute();
     }
 
-    private static function execute(): bool
+    protected static function dispatchDuringRegistration(string $method, string $route, array $routeItem): bool
+    {
+        if (!self::$dispatchOnRegistration) {
+            return false;
+        }
+
+        self::$registeredMethods[$method] = true;
+
+        if ($method !== self::$httpMethod) {
+            return false;
+        }
+
+        $matches = self::matchesRoute($route);
+        if ($matches === null) {
+            return false;
+        }
+
+        self::$route = self::withRouteData($routeItem, $matches);
+        return self::execute();
+    }
+
+    /**
+     * @return array<int, string>|null
+     */
+    private static function matchesRoute(string $route): ?array
+    {
+        if (!preg_match('~^' . $route . '$~', self::$patch, $matches)) {
+            return null;
+        }
+
+        array_shift($matches);
+
+        return $matches;
+    }
+
+    /**
+     * @param array<string, mixed> $route
+     * @param array<int, string> $matches
+     * @return array<string, mixed>
+     */
+    private static function withRouteData(array $route, array $matches): array
+    {
+        $params = [];
+
+        foreach ($route['parameterNames'] ?? [] as $index => $name) {
+            $params[$name] = $matches[$index] ?? null;
+        }
+
+        $route['data'] = $params;
+
+        return $route;
+    }
+
+    protected static function execute(): bool
     {
         if (self::$route) {
             if (is_callable(self::$route['handler'])) {
