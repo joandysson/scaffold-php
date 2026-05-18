@@ -50,9 +50,10 @@ Router::get('/', 'HomeController:home');
 Router::get('/blog/{id}', 'HomeController:blog');
 
 // Agrupando rotas com um prefixo
-Router::prefix('/api');
-Router::get('/status', function () {
-    echo 'API ok';
+Router::group('/api', function (Router $router): void {
+    $router->get('/status', function () {
+        echo 'API ok';
+    });
 });
 ```
 

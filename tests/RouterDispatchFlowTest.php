@@ -5,6 +5,7 @@ require_once __DIR__ . '/../config/functions.php';
 use Config\Router\Dispatch;
 use Config\Router\RouteDispatched;
 use Config\Router\Router;
+use Config\Request\Request;
 use PHPUnit\Framework\TestCase;
 
 class RouterDispatchFlowTest extends TestCase
@@ -111,6 +112,34 @@ class RouterDispatchFlowTest extends TestCase
         } catch (RouteDispatched) {
         }
 
+        $this->assertTrue($executed);
+    }
+
+    public function testDispatchOnRegistrationSupportsGroupedPrefixAndMiddleware(): void
+    {
+        $this->setServer('GET', '/api/v1/status');
+
+        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+        $dispatchOnRegistration->setAccessible(true);
+        $dispatchOnRegistration->setValue(true);
+
+        $middlewareCalled = false;
+        $executed = false;
+
+        try {
+            Router::middleware([
+                function (Request $request) use (&$middlewareCalled): void {
+                    $middlewareCalled = $request->path() === '/api/v1/status';
+                }
+            ])->group('/api/v1', function (Router $router) use (&$executed): void {
+                $router->get('/status', function () use (&$executed): void {
+                    $executed = true;
+                });
+            });
+        } catch (RouteDispatched) {
+        }
+
+        $this->assertTrue($middlewareCalled);
         $this->assertTrue($executed);
     }
 }

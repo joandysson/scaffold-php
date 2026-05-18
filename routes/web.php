@@ -6,17 +6,29 @@ use Config\Response\HttpStatus;
 use Config\Response\Response;
 use App\Middleware\BasicAuthMiddleware;
 
-// Middlewares are executed before each matched route.
-// Register them using Router::addMiddleware().
-// Example:
+// This file is read in order. The first route that matches the current request is executed immediately.
+// Register global middlewares with Router::addMiddleware(); they run before each matched route.
 // Router::addMiddleware(function (Request $req) {
 //     // Authentication or logging logic
 // });
 
-// Grouping routes under a base path
+// Grouping routes under a base path.
 // Router::group('/api/v1', function (Router $router) {
 //     $router->get('/status', 'HealthController:show');
 // });
+
+// Grouping routes that share middleware.
+// Router::middleware([BasicAuthMiddleware::class])->group(function (Router $router) {
+//     $router->get('/admin', 'AdminController:index');
+//     $router->post('/admin/posts', 'AdminController:create');
+// });
+
+// Applying middleware and a path prefix to every route in the group.
+// Router::middleware([BasicAuthMiddleware::class])->group('/api/v2', function (Router $router) {
+//     $router->get('/posts', 'Api\\PostController:index');
+//     $router->post('/posts', 'Api\\PostController:create');
+// });
+
 // Basic GET route using a controller action
 Router::get('/', 'HomeController:home');
 
@@ -28,17 +40,6 @@ Router::get('/hello/{name}', function (Request $request) {
     $params = $request->getRouteParams();
     echo "Hello {$params['name']}";
 });
-
-// Grouping routes that share middleware
-// Router::middleware([BasicAuthMiddleware::class])->group(function (Router $router) {
-//     $router->get('/admin', 'AdminController:index');
-//     $router->post('/admin/posts', 'AdminController:create');
-// });
-// With a path prefix applied to every route in the group
-// Router::middleware([BasicAuthMiddleware::class])->group('/api/v2', function (Router $router) {
-//     $router->get('/posts', 'Api\\PostController:index');
-//     $router->post('/posts', 'Api\\PostController:create');
-// });
 
 // POST route example
 Router::post('/submit', function () {
