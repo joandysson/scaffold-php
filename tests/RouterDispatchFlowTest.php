@@ -38,6 +38,10 @@ class RouterDispatchFlowTest extends TestCase
             $prop->setAccessible(true);
             $prop->setValue($value);
         }
+
+        $namedRoutes = new ReflectionProperty(Router::class, 'namedRoutes');
+        $namedRoutes->setAccessible(true);
+        $namedRoutes->setValue([]);
     }
 
     protected function setUp(): void
@@ -141,5 +145,23 @@ class RouterDispatchFlowTest extends TestCase
 
         $this->assertTrue($middlewareCalled);
         $this->assertTrue($executed);
+    }
+
+    public function testNamedRoutesRemainAvailableDuringRegistration(): void
+    {
+        $this->setServer('GET', '/target');
+
+        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+        $dispatchOnRegistration->setAccessible(true);
+        $dispatchOnRegistration->setValue(true);
+
+        Router::get('/contact', function (): void {
+        }, 'contact.page');
+
+        $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
+        $routesProperty->setAccessible(true);
+
+        $this->assertSame('/contact', Router::route('contact.page'));
+        $this->assertSame([], $routesProperty->getValue());
     }
 }

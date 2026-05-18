@@ -17,6 +17,8 @@ class Router extends Dispatch
     private static string $prefix = '';
     /** @var array<int, callable> */
     private static array $groupMiddlewares = [];
+    /** @var array<string, array<string, mixed>> */
+    private static array $namedRoutes = [];
 
     public function __construct(bool $boot = true)
     {
@@ -199,7 +201,13 @@ class Router extends Dispatch
 
         $route = preg_replace('~\{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*\}~', '([^/]+)', $route);
 
-        if (parent::dispatchDuringRegistration($method, $route, $router())) {
+        $routeItem = $router();
+
+        if ($name !== null) {
+            self::$namedRoutes[$name] = $routeItem;
+        }
+
+        if (parent::dispatchDuringRegistration($method, $route, $routeItem)) {
             throw new RouteDispatched();
         }
 
@@ -207,7 +215,7 @@ class Router extends Dispatch
             return;
         }
 
-        parent::$routes[$method][$route] = $router();
+        parent::$routes[$method][$route] = $routeItem;
     }
 
     private static function handler(callable|string $handler, string $namespace): Closure|string
@@ -223,6 +231,10 @@ class Router extends Dispatch
 
     public static function route(string $name, array $data = []): ?string
     {
+        if (!empty(self::$namedRoutes[$name])) {
+            return self::treat(self::$namedRoutes[$name], $data);
+        }
+
         foreach (static::$routes as $http_verb) {
             foreach ($http_verb as $route_item) {
                 if (!empty($route_item['name']) && $route_item['name'] == $name || $route_item['route'] === $name) {
