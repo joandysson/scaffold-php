@@ -54,7 +54,7 @@ class RouterDispatchFlowTest extends TestCase
         $this->resetRoutes();
     }
 
-    public function testDispatchOnRegistrationExecutesFirstMatchingRouteWithoutStoringAllRoutes(): void
+    public function testDispatchOnRegistrationExecutesFirstMatchingRouteWithoutReadingRemainingRoutes(): void
     {
         $this->setServer('GET', '/target/42');
 
@@ -70,14 +70,19 @@ class RouterDispatchFlowTest extends TestCase
             Router::get('/target/{id}', function (string $id) use (&$executed): void {
                 $executed = $id === '42';
             });
+            Router::get('/after-target', function (): void {
+            });
         } catch (RouteDispatched) {
         }
 
         $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
         $routesProperty->setAccessible(true);
+        $routes = $routesProperty->getValue();
 
         $this->assertTrue($executed);
-        $this->assertSame([], $routesProperty->getValue());
+        $this->assertArrayHasKey('/other', $routes['GET']);
+        $this->assertArrayHasKey('/target/([^/]+)', $routes['GET']);
+        $this->assertArrayNotHasKey('/after-target', $routes['GET']);
     }
 
     public function testRunExecutesFirstMatchingRoute(): void
@@ -160,8 +165,9 @@ class RouterDispatchFlowTest extends TestCase
 
         $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
         $routesProperty->setAccessible(true);
+        $routes = $routesProperty->getValue();
 
         $this->assertSame('/contact', Router::route('contact.page'));
-        $this->assertSame([], $routesProperty->getValue());
+        $this->assertArrayHasKey('/contact', $routes['GET']);
     }
 }
