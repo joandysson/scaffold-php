@@ -11,7 +11,6 @@ use RuntimeException;
 abstract class Dispatch
 {
     protected static string $httpMethod;
-    protected static array $routes = [];
     protected static ?array $route = null;
     protected static string $patch;
     protected static ?string $projectUrl = null;
@@ -33,11 +32,6 @@ abstract class Dispatch
         self::$patch = explode('?', $_SERVER['REQUEST_URI'])[0];
         self::$separator = ':';
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
-    }
-
-    public function __debugInfo(): array
-    {
-        return self::$routes;
     }
 
     public static function group(?string $group = null): ?string
@@ -65,25 +59,12 @@ abstract class Dispatch
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
         self::$patch = explode('?', $_SERVER['REQUEST_URI'])[0];
 
-        if (
-            (empty(self::$routes) || empty(self::$routes[self::$httpMethod]))
-            && empty(self::$registeredMethods[self::$httpMethod])
-        ) {
+        if (empty(self::$registeredMethods[self::$httpMethod])) {
             self::$error = self::NOT_IMPLEMENTED;
             return false;
         }
 
         self::$route = null;
-        foreach (self::$routes[self::$httpMethod] ?? [] as $key => $route) {
-            $matches = self::matchesRoute($key);
-            if ($matches === null) {
-                continue;
-            }
-
-            self::$route = self::withRouteData($route, $matches);
-            return self::execute();
-        }
-
         return self::execute();
     }
 

@@ -17,6 +17,7 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use Config\Router\Router;
     use Config\Router\Dispatch;
+    use Config\Router\RouteDispatched;
     use Config\Request\Request;
     use App\Controller\DummyInjectionController;
 
@@ -38,10 +39,11 @@ namespace {
         private function resetRoutes(): void
         {
             foreach ([
-                'routes' => [],
                 'route' => null,
                 'error' => null,
-                'separator' => ':'
+                'separator' => ':',
+                'dispatchOnRegistration' => false,
+                'registeredMethods' => []
             ] as $name => $value) {
                 $prop = new ReflectionProperty(Dispatch::class, $name);
                 $prop->setAccessible(true);
@@ -54,22 +56,38 @@ namespace {
             $this->resetRoutes();
         }
 
+        private function dispatchRoutes(callable $callback): void
+        {
+            $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+            $dispatchOnRegistration->setAccessible(true);
+            $dispatchOnRegistration->setValue(true);
+
+            try {
+                $callback();
+            } catch (RouteDispatched) {
+            } finally {
+                $dispatchOnRegistration->setValue(false);
+            }
+        }
+
         public function testClosureInjection(): void
         {
             $this->setServer('GET', '/inject');
             $captured = null;
-            Router::get('/inject', function (Request $req) use (&$captured) {
-                $captured = $req;
+            $this->dispatchRoutes(function () use (&$captured): void {
+                Router::get('/inject', function (Request $req) use (&$captured) {
+                    $captured = $req;
+                });
             });
-            Router::run();
             $this->assertInstanceOf(Request::class, $captured);
         }
 
         public function testControllerMethodInjection(): void
         {
             $this->setServer('GET', '/controller');
-            Router::get('/controller', 'DummyInjectionController:handle');
-            Router::run();
+            $this->dispatchRoutes(function (): void {
+                Router::get('/controller', 'DummyInjectionController:handle');
+            });
             $this->assertInstanceOf(Request::class, DummyInjectionController::$captured);
         }
 
@@ -77,10 +95,11 @@ namespace {
         {
             $this->setServer('GET', '/blog/42/test-slug');
             $captured = null;
-            Router::get('/blog/{id}/{slug}', function (Request $req) use (&$captured) {
-                $captured = $req->getRouteParams();
+            $this->dispatchRoutes(function () use (&$captured): void {
+                Router::get('/blog/{id}/{slug}', function (Request $req) use (&$captured) {
+                    $captured = $req->getRouteParams();
+                });
             });
-            Router::run();
             $this->assertSame(['id' => '42', 'slug' => 'test-slug'], $captured);
         }
     }

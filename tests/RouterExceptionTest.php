@@ -23,10 +23,11 @@ class RouterExceptionTest extends TestCase
     private function resetRoutes(): void
     {
         foreach ([
-            'routes' => [],
             'route' => null,
             'error' => null,
-            'separator' => ':'
+            'separator' => ':',
+            'dispatchOnRegistration' => false,
+            'registeredMethods' => []
         ] as $name => $value) {
             $prop = new ReflectionProperty(Dispatch::class, $name);
             $prop->setAccessible(true);
@@ -39,11 +40,18 @@ class RouterExceptionTest extends TestCase
         $this->resetRoutes();
     }
 
+    private function enableDispatchOnRegistration(): void
+    {
+        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+        $dispatchOnRegistration->setAccessible(true);
+        $dispatchOnRegistration->setValue(true);
+    }
+
     public function testExceptionForMissingControllerMethod(): void
     {
         $this->setServer('GET', '/foo');
-        Router::get('/foo', 'HomeController:missingMethod');
+        $this->enableDispatchOnRegistration();
         $this->expectException(RuntimeException::class);
-        Router::run();
+        Router::get('/foo', 'HomeController:missingMethod');
     }
 }

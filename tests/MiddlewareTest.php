@@ -16,6 +16,7 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use Config\Router\Router;
     use Config\Router\Dispatch;
+    use Config\Router\RouteDispatched;
     use MiddlewareTestNamespace\FlagMiddleware;
 
     class MiddlewareTest extends TestCase
@@ -36,15 +37,30 @@ namespace {
         private function resetRoutes(): void
         {
             foreach ([
-                'routes' => [],
                 'route' => null,
                 'error' => null,
                 'separator' => ':',
-                'middlewares' => []
+                'middlewares' => [],
+                'dispatchOnRegistration' => false,
+                'registeredMethods' => []
             ] as $name => $value) {
                 $prop = new \ReflectionProperty(Dispatch::class, $name);
                 $prop->setAccessible(true);
                 $prop->setValue($value);
+            }
+        }
+
+        private function dispatchRoutes(callable $callback): void
+        {
+            $dispatchOnRegistration = new \ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+            $dispatchOnRegistration->setAccessible(true);
+            $dispatchOnRegistration->setValue(true);
+
+            try {
+                $callback();
+            } catch (RouteDispatched) {
+            } finally {
+                $dispatchOnRegistration->setValue(false);
             }
         }
 
@@ -58,11 +74,12 @@ namespace {
         {
             $this->setServer('GET', '/middleware');
             Router::addMiddleware(new FlagMiddleware());
-            Router::get('/middleware', function () {
-                echo 'ok';
-            });
             ob_start();
-            Router::run();
+            $this->dispatchRoutes(function (): void {
+                Router::get('/middleware', function () {
+                    echo 'ok';
+                });
+            });
             ob_get_clean();
             $this->assertTrue(FlagMiddleware::$called);
         }
@@ -71,11 +88,12 @@ namespace {
         {
             $this->setServer('GET', '/middleware-class');
             Router::addMiddleware(FlagMiddleware::class);
-            Router::get('/middleware-class', function () {
-                echo 'ok';
-            });
             ob_start();
-            Router::run();
+            $this->dispatchRoutes(function (): void {
+                Router::get('/middleware-class', function () {
+                    echo 'ok';
+                });
+            });
             ob_get_clean();
             $this->assertTrue(FlagMiddleware::$called);
         }
@@ -83,11 +101,12 @@ namespace {
         public function testRouteSpecificMiddlewareIsExecuted(): void
         {
             $this->setServer('GET', '/middleware-scoped');
-            Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
-                echo 'ok';
-            });
             ob_start();
-            Router::run();
+            $this->dispatchRoutes(function (): void {
+                Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
+                    echo 'ok';
+                });
+            });
             ob_get_clean();
             $this->assertTrue(FlagMiddleware::$called);
         }
@@ -95,14 +114,15 @@ namespace {
         public function testRouteSpecificMiddlewareDoesNotAffectOtherRoutes(): void
         {
             $this->setServer('GET', '/no-middleware');
-            Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
-                echo 'ok';
-            });
-            Router::get('/no-middleware', function () {
-                echo 'ok';
-            });
             ob_start();
-            Router::run();
+            $this->dispatchRoutes(function (): void {
+                Router::middleware([FlagMiddleware::class])->get('/middleware-scoped', function () {
+                    echo 'ok';
+                });
+                Router::get('/no-middleware', function () {
+                    echo 'ok';
+                });
+            });
             ob_get_clean();
             $this->assertFalse(FlagMiddleware::$called);
         }

@@ -27,7 +27,6 @@ class RouterDispatchFlowTest extends TestCase
     private function resetRoutes(): void
     {
         foreach ([
-            'routes' => [],
             'route' => null,
             'error' => null,
             'separator' => ':',
@@ -75,29 +74,29 @@ class RouterDispatchFlowTest extends TestCase
         } catch (RouteDispatched) {
         }
 
-        $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
-        $routesProperty->setAccessible(true);
-        $routes = $routesProperty->getValue();
-
         $this->assertTrue($executed);
-        $this->assertSame([], $routes);
     }
 
-    public function testRunExecutesFirstMatchingRoute(): void
+    public function testDispatchOnRegistrationExecutesFirstMatchingRoute(): void
     {
         $this->setServer('GET', '/posts/123');
 
         $handledBy = null;
 
-        Router::get('/posts/{id}', function () use (&$handledBy): void {
-            $handledBy = 'parameter';
-        });
+        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
+        $dispatchOnRegistration->setAccessible(true);
+        $dispatchOnRegistration->setValue(true);
 
-        Router::get('/posts/123', function () use (&$handledBy): void {
-            $handledBy = 'exact';
-        });
+        try {
+            Router::get('/posts/{id}', function () use (&$handledBy): void {
+                $handledBy = 'parameter';
+            });
 
-        Router::run();
+            Router::get('/posts/123', function () use (&$handledBy): void {
+                $handledBy = 'exact';
+            });
+        } catch (RouteDispatched) {
+        }
 
         $this->assertSame('parameter', $handledBy);
     }

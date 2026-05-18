@@ -214,8 +214,6 @@ class Router extends Dispatch
         if (self::$dispatchOnRegistration) {
             return;
         }
-
-        parent::$routes[$method][$route] = $routeItem;
     }
 
     private static function handler(callable|string $handler, string $namespace): Closure|string
@@ -233,16 +231,6 @@ class Router extends Dispatch
     {
         if (!empty(self::$namedRoutes[$name])) {
             return self::treat(self::$namedRoutes[$name], $data);
-        }
-
-        foreach (static::$routes as $http_verb) {
-            foreach ($http_verb as $route_item) {
-                if (!empty($route_item['name']) && $route_item['name'] == $name || $route_item['route'] === $name) {
-                    $route_item['route'] = empty($route_item['route']) ? '/' : $route_item['route'];
-
-                    return self::treat($route_item, $data);
-                }
-            }
         }
 
         return null;
