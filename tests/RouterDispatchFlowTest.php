@@ -80,9 +80,7 @@ class RouterDispatchFlowTest extends TestCase
         $routes = $routesProperty->getValue();
 
         $this->assertTrue($executed);
-        $this->assertArrayHasKey('/other', $routes['GET']);
-        $this->assertArrayHasKey('/target/([^/]+)', $routes['GET']);
-        $this->assertArrayNotHasKey('/after-target', $routes['GET']);
+        $this->assertSame([], $routes);
     }
 
     public function testRunExecutesFirstMatchingRoute(): void
@@ -163,11 +161,6 @@ class RouterDispatchFlowTest extends TestCase
         Router::get('/contact', function (): void {
         }, 'contact.page');
 
-        $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
-        $routesProperty->setAccessible(true);
-        $routes = $routesProperty->getValue();
-
         $this->assertSame('/contact', Router::route('contact.page'));
-        $this->assertArrayHasKey('/contact', $routes['GET']);
     }
 }

@@ -207,8 +207,6 @@ class Router extends Dispatch
             self::$namedRoutes[$name] = $routeItem;
         }
 
-        parent::$routes[$method][$route] = $routeItem;
-
         if (parent::dispatchDuringRegistration($method, $route, $routeItem)) {
             throw new RouteDispatched();
         }
@@ -216,6 +214,8 @@ class Router extends Dispatch
         if (self::$dispatchOnRegistration) {
             return;
         }
+
+        parent::$routes[$method][$route] = $routeItem;
     }
 
     private static function handler(callable|string $handler, string $namespace): Closure|string
