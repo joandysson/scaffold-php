@@ -24,11 +24,6 @@ final class CronRunner
         }
 
         $task = $this->tasks[$name];
-
-        if (!$task instanceof CronInterface) {
-            throw new InvalidArgumentException("Task '{$name}' is not a valid cron task.");
-        }
-
         $task->run();
     }
 

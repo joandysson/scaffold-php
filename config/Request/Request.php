@@ -19,7 +19,8 @@ class Request
     public function __construct(string $rawInput = '')
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $this->path = explode('?', $_SERVER['REQUEST_URI'])[0] ?? '/';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $this->path = explode('?', $requestUri)[0];
         $this->headers = function_exists('getallheaders') ? (getallheaders() ?: []) : [];
         $this->query = $_GET;
         $this->files = $_FILES;

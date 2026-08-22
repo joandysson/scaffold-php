@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.5-apache
 
 ARG APP_STAGE=local
 ARG XDEBUG_MODE
@@ -16,13 +16,10 @@ RUN set -eux; \
     docker-php-ext-install pdo pdo_mysql intl zip; \
     rm -rf /var/lib/apt/lists/*
 
-# Install and enable MongoDB extension
-RUN pecl install mongodb \
-    && docker-php-ext-enable mongodb
-
 # Install Xdebug only outside production images
-RUN if [ "$APP_STAGE" != "prod" ]; then \
-        pecl install xdebug-3.4.5; \
+RUN set -eux; \
+    if [ "$APP_STAGE" != "prod" ]; then \
+        pecl install xdebug; \
         docker-php-ext-enable xdebug; \
         { \
             echo "zend_extension=xdebug.so"; \
@@ -34,7 +31,7 @@ RUN if [ "$APP_STAGE" != "prod" ]; then \
     fi
 
 # Install Composer
-COPY --from=composer:2.7.4 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.9.8 /usr/bin/composer /usr/local/bin/composer
 
 # Enable Apache modules
 RUN a2enmod rewrite headers

@@ -10,18 +10,19 @@ use PHPUnit\Framework\TestCase;
 
 class RouterMiddlewareGroupTest extends TestCase
 {
+    private function setDispatchProperty(string $name, mixed $value): void
+    {
+        $property = new ReflectionProperty(Dispatch::class, $name);
+        $property->setValue(null, $value);
+    }
+
     private function setServer(string $method, string $uri): void
     {
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['REQUEST_URI'] = $uri;
 
-        $patchProp = new ReflectionProperty(Dispatch::class, 'patch');
-        $patchProp->setAccessible(true);
-        $patchProp->setValue(explode('?', $uri)[0]);
-
-        $methodProp = new ReflectionProperty(Dispatch::class, 'httpMethod');
-        $methodProp->setAccessible(true);
-        $methodProp->setValue($method);
+        $this->setDispatchProperty('patch', explode('?', $uri)[0]);
+        $this->setDispatchProperty('httpMethod', $method);
     }
 
     private function resetRoutes(): void
@@ -32,9 +33,7 @@ class RouterMiddlewareGroupTest extends TestCase
             'error' => null,
             'separator' => ':'
         ] as $name => $value) {
-            $prop = new ReflectionProperty(Dispatch::class, $name);
-            $prop->setAccessible(true);
-            $prop->setValue($value);
+            $this->setDispatchProperty($name, $value);
         }
     }
 
@@ -89,7 +88,6 @@ class RouterMiddlewareGroupTest extends TestCase
         Router::run();
 
         $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
-        $routesProperty->setAccessible(true);
         $routes = $routesProperty->getValue();
 
         $this->assertTrue($middlewareCalled);
@@ -113,7 +111,6 @@ class RouterMiddlewareGroupTest extends TestCase
         Router::run();
 
         $routesProperty = new ReflectionProperty(Dispatch::class, 'routes');
-        $routesProperty->setAccessible(true);
         $routes = $routesProperty->getValue();
 
         $this->assertArrayHasKey('/no-prefix', $routes['GET']);
