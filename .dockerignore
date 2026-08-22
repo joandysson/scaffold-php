@@ -8,7 +8,8 @@
 vendor/
 node_modules/
 docker-compose.yml
-docs/
+docs/*
+!docs/api.json
 storage/*.log
 storage/cache/
 .env
