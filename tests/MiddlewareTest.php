@@ -16,7 +16,6 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use Config\Router\Router;
     use Config\Router\Dispatch;
-    use Config\Router\RouteDispatched;
     use MiddlewareTestNamespace\FlagMiddleware;
 
     class MiddlewareTest extends TestCase
@@ -43,6 +42,7 @@ namespace {
                 'separator' => ':',
                 'middlewares' => [],
                 'dispatchOnRegistration' => false,
+                'hasDispatchedCurrentRequest' => false,
                 'registeredMethods' => []
             ] as $name => $value) {
                 $prop = new \ReflectionProperty(Dispatch::class, $name);
@@ -59,7 +59,6 @@ namespace {
 
             try {
                 $callback();
-            } catch (RouteDispatched) {
             } finally {
                 $dispatchOnRegistration->setValue(false);
             }

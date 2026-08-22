@@ -19,6 +19,7 @@ abstract class Dispatch
     protected static ?int $error = null;
     protected static array $middlewares = [];
     protected static bool $dispatchOnRegistration = false;
+    protected static bool $hasDispatchedCurrentRequest = false;
     /** @var array<string, bool> */
     protected static array $registeredMethods = [];
 
@@ -59,6 +60,10 @@ abstract class Dispatch
         self::$httpMethod = $_SERVER['REQUEST_METHOD'];
         self::$patch = explode('?', $_SERVER['REQUEST_URI'])[0];
 
+        if (self::$dispatchOnRegistration && self::$hasDispatchedCurrentRequest) {
+            return true;
+        }
+
         if (empty(self::$registeredMethods[self::$httpMethod])) {
             self::$error = self::NOT_IMPLEMENTED;
             return false;
@@ -76,6 +81,10 @@ abstract class Dispatch
 
         self::$registeredMethods[$method] = true;
 
+        if (self::$hasDispatchedCurrentRequest) {
+            return false;
+        }
+
         if ($method !== self::$httpMethod) {
             return false;
         }
@@ -86,6 +95,7 @@ abstract class Dispatch
         }
 
         self::$route = self::withRouteData($routeItem, $matches);
+        self::$hasDispatchedCurrentRequest = true;
         return self::execute();
     }
 

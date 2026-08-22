@@ -17,7 +17,6 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use Config\Router\Router;
     use Config\Router\Dispatch;
-    use Config\Router\RouteDispatched;
     use Config\Request\Request;
     use App\Controller\DummyInjectionController;
 
@@ -44,6 +43,7 @@ namespace {
                 'error' => null,
                 'separator' => ':',
                 'dispatchOnRegistration' => false,
+                'hasDispatchedCurrentRequest' => false,
                 'registeredMethods' => []
             ] as $name => $value) {
                 $prop = new ReflectionProperty(Dispatch::class, $name);
@@ -65,7 +65,6 @@ namespace {
 
             try {
                 $callback();
-            } catch (RouteDispatched) {
             } finally {
                 $dispatchOnRegistration->setValue(false);
             }

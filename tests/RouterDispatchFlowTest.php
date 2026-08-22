@@ -3,7 +3,6 @@
 require_once __DIR__ . '/../config/functions.php';
 
 use Config\Router\Dispatch;
-use Config\Router\RouteDispatched;
 use Config\Router\Router;
 use Config\Request\Request;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +30,7 @@ class RouterDispatchFlowTest extends TestCase
             'error' => null,
             'separator' => ':',
             'dispatchOnRegistration' => false,
+            'hasDispatchedCurrentRequest' => false,
             'registeredMethods' => []
         ] as $name => $value) {
             $prop = new ReflectionProperty(Dispatch::class, $name);
@@ -41,6 +41,10 @@ class RouterDispatchFlowTest extends TestCase
         $namedRoutes = new ReflectionProperty(Router::class, 'namedRoutes');
         $namedRoutes->setAccessible(true);
         $namedRoutes->setValue([]);
+
+        $routeTemplates = new ReflectionProperty(Router::class, 'routeTemplates');
+        $routeTemplates->setAccessible(true);
+        $routeTemplates->setValue([]);
     }
 
     protected function setUp(): void
@@ -53,28 +57,34 @@ class RouterDispatchFlowTest extends TestCase
         $this->resetRoutes();
     }
 
-    public function testDispatchOnRegistrationExecutesFirstMatchingRouteWithoutReadingRemainingRoutes(): void
+    private function enableDispatchOnRegistration(): void
     {
-        $this->setServer('GET', '/target/42');
-
         $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
         $dispatchOnRegistration->setAccessible(true);
         $dispatchOnRegistration->setValue(true);
+    }
+
+    public function testDispatchOnRegistrationExecutesFirstMatchingRouteAndContinuesRegisteringLaterRoutes(): void
+    {
+        $this->setServer('GET', '/target/42');
+
+        $this->enableDispatchOnRegistration();
 
         $executed = false;
+        $executedAgain = false;
         Router::get('/other', function (): void {
         });
 
-        try {
-            Router::get('/target/{id}', function (string $id) use (&$executed): void {
-                $executed = $id === '42';
-            });
-            Router::get('/after-target', function (): void {
-            });
-        } catch (RouteDispatched) {
-        }
+        Router::get('/target/{id}', function (string $id) use (&$executed): void {
+            $executed = $id === '42';
+        });
+        Router::get('/after-target', function () use (&$executedAgain): void {
+            $executedAgain = true;
+        }, 'after.target');
 
         $this->assertTrue($executed);
+        $this->assertFalse($executedAgain);
+        $this->assertSame('/after-target', Router::route('after.target'));
     }
 
     public function testDispatchOnRegistrationExecutesFirstMatchingRoute(): void
@@ -83,20 +93,15 @@ class RouterDispatchFlowTest extends TestCase
 
         $handledBy = null;
 
-        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
-        $dispatchOnRegistration->setAccessible(true);
-        $dispatchOnRegistration->setValue(true);
+        $this->enableDispatchOnRegistration();
 
-        try {
-            Router::get('/posts/{id}', function () use (&$handledBy): void {
-                $handledBy = 'parameter';
-            });
+        Router::get('/posts/{id}', function () use (&$handledBy): void {
+            $handledBy = 'parameter';
+        });
 
-            Router::get('/posts/123', function () use (&$handledBy): void {
-                $handledBy = 'exact';
-            });
-        } catch (RouteDispatched) {
-        }
+        Router::get('/posts/123', function () use (&$handledBy): void {
+            $handledBy = 'exact';
+        });
 
         $this->assertSame('parameter', $handledBy);
     }
@@ -105,61 +110,113 @@ class RouterDispatchFlowTest extends TestCase
     {
         $this->setServer('GET', '/');
 
-        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
-        $dispatchOnRegistration->setAccessible(true);
-        $dispatchOnRegistration->setValue(true);
+        $this->enableDispatchOnRegistration();
 
         $executed = false;
 
-        try {
-            Router::get('/', function () use (&$executed): void {
-                $executed = true;
-            });
-        } catch (RouteDispatched) {
-        }
+        Router::get('/', function () use (&$executed): void {
+            $executed = true;
+        });
 
         $this->assertTrue($executed);
+        $this->assertSame('/', Router::route('/'));
     }
 
     public function testDispatchOnRegistrationSupportsGroupedPrefixAndMiddleware(): void
     {
         $this->setServer('GET', '/api/v1/status');
 
-        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
-        $dispatchOnRegistration->setAccessible(true);
-        $dispatchOnRegistration->setValue(true);
+        $this->enableDispatchOnRegistration();
 
         $middlewareCalled = false;
         $executed = false;
 
-        try {
-            Router::middleware([
-                function (Request $request) use (&$middlewareCalled): void {
-                    $middlewareCalled = $request->path() === '/api/v1/status';
-                }
-            ])->group('/api/v1', function (Router $router) use (&$executed): void {
-                $router->get('/status', function () use (&$executed): void {
-                    $executed = true;
-                });
+        Router::middleware([
+            function (Request $request) use (&$middlewareCalled): void {
+                $middlewareCalled = $request->path() === '/api/v1/status';
+            }
+        ])->group('/api/v1', function (Router $router) use (&$executed): void {
+            $router->get('/status', function () use (&$executed): void {
+                $executed = true;
             });
-        } catch (RouteDispatched) {
-        }
+        });
 
         $this->assertTrue($middlewareCalled);
         $this->assertTrue($executed);
     }
 
-    public function testNamedRoutesRemainAvailableDuringRegistration(): void
+    public function testNamedRoutesRemainAvailableWhenDeclaredAfterTheMatchedRoute(): void
     {
         $this->setServer('GET', '/target');
 
-        $dispatchOnRegistration = new ReflectionProperty(Dispatch::class, 'dispatchOnRegistration');
-        $dispatchOnRegistration->setAccessible(true);
-        $dispatchOnRegistration->setValue(true);
+        $this->enableDispatchOnRegistration();
 
+        Router::get('/target', function (): void {
+        }, 'current.request');
         Router::get('/contact', function (): void {
-        }, 'contact.page');
+        }, 'auth.login');
 
-        $this->assertSame('/contact', Router::route('contact.page'));
+        $this->assertSame('/contact', Router::route('auth.login'));
+    }
+
+    public function testRouteTemplateResolutionRemainsAvailableWithoutNamedRoutes(): void
+    {
+        $this->setServer('GET', '/target');
+
+        $this->enableDispatchOnRegistration();
+
+        Router::get('/target', function (): void {
+        });
+        Router::get('/posts/{id}', function (): void {
+        });
+
+        $this->assertSame('/posts/42', Router::route('/posts/{id}', ['id' => 42]));
+    }
+
+    public function testRouteTemplateResolutionAppendsQueryStringForExtraParameters(): void
+    {
+        $this->setServer('GET', '/target');
+
+        $this->enableDispatchOnRegistration();
+
+        Router::get('/target', function (): void {
+        });
+        Router::get('/posts/{id}', function (): void {
+        });
+
+        $this->assertSame('/posts/42?tab=comments', Router::route('/posts/{id}', ['id' => 42, 'tab' => 'comments']));
+    }
+
+    public function testGroupedRouteTemplateResolutionUsesTheResolvedPrefix(): void
+    {
+        $this->setServer('GET', '/target');
+
+        $this->enableDispatchOnRegistration();
+
+        Router::get('/target', function (): void {
+        });
+        Router::group('/api/v2', function (Router $router): void {
+            $router->get('/posts/{id}', function (): void {
+            });
+        });
+
+        $this->assertSame('/api/v2/posts/99', Router::route('/api/v2/posts/{id}', ['id' => 99]));
+    }
+
+    public function testRunReturnsTheMatchedRouteResultDuringRegistrationWithoutOverwritingIt(): void
+    {
+        $this->setServer('GET', '/target');
+
+        $this->enableDispatchOnRegistration();
+
+        $executed = false;
+
+        Router::get('/target', function () use (&$executed): void {
+            $executed = true;
+        });
+
+        $this->assertTrue(Router::run());
+        $this->assertTrue($executed);
+        $this->assertNull(Router::error());
     }
 }

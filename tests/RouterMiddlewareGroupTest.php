@@ -5,7 +5,6 @@ require_once __DIR__ . '/../config/functions.php';
 use Config\Request\Request;
 use Config\Response\Response;
 use Config\Router\Dispatch;
-use Config\Router\RouteDispatched;
 use Config\Router\Router;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +32,7 @@ class RouterMiddlewareGroupTest extends TestCase
             'error' => null,
             'separator' => ':',
             'dispatchOnRegistration' => false,
+            'hasDispatchedCurrentRequest' => false,
             'registeredMethods' => []
         ] as $name => $value) {
             $this->setDispatchProperty($name, $value);
@@ -52,7 +52,6 @@ class RouterMiddlewareGroupTest extends TestCase
 
         try {
             $callback();
-        } catch (RouteDispatched) {
         } finally {
             $dispatchOnRegistration->setValue(false);
         }

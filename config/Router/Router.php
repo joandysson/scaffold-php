@@ -19,6 +19,8 @@ class Router extends Dispatch
     private static array $groupMiddlewares = [];
     /** @var array<string, array<string, mixed>> */
     private static array $namedRoutes = [];
+    /** @var array<string, array<string, mixed>> */
+    private static array $routeTemplates = [];
 
     public function __construct(bool $boot = true)
     {
@@ -32,10 +34,10 @@ class Router extends Dispatch
     public static function init(): void
     {
         self::$dispatchOnRegistration = true;
+        self::$hasDispatchedCurrentRequest = false;
 
         try {
             require_once dirname(__DIR__, 2) . '/routes/web.php';
-        } catch (RouteDispatched) {
         } finally {
             self::$dispatchOnRegistration = false;
         }
@@ -162,6 +164,7 @@ class Router extends Dispatch
 
         if ($route === '/') {
             self::addRoute($method, '', $handler, $name, $middlewares);
+            return;
         }
 
         $route = (!parent::$group ? $route : '/' . parent::$group . "{$route}");
@@ -202,14 +205,15 @@ class Router extends Dispatch
         $route = preg_replace('~\{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*\}~', '([^/]+)', $route);
 
         $routeItem = $router();
+        $routeLookupItem = self::routeLookupItem($routeItem);
 
         if ($name !== null) {
-            self::$namedRoutes[$name] = $routeItem;
+            self::$namedRoutes[$name] = $routeLookupItem;
         }
 
-        if (parent::dispatchDuringRegistration($method, $route, $routeItem)) {
-            throw new RouteDispatched();
-        }
+        self::$routeTemplates[$routeLookupItem['route']] = $routeLookupItem;
+
+        parent::dispatchDuringRegistration($method, $route, $routeItem);
 
         if (self::$dispatchOnRegistration) {
             return;
@@ -233,7 +237,24 @@ class Router extends Dispatch
             return self::treat(self::$namedRoutes[$name], $data);
         }
 
+        if (!empty(self::$routeTemplates[$name])) {
+            return self::treat(self::$routeTemplates[$name], $data);
+        }
+
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $routeItem
+     * @return array<string, mixed>
+     */
+    private static function routeLookupItem(array $routeItem): array
+    {
+        if ($routeItem['route'] === '') {
+            $routeItem['route'] = '/';
+        }
+
+        return $routeItem;
     }
 
     public static function redirect(

@@ -28,6 +28,7 @@ class RouterExceptionTest extends TestCase
             'error' => null,
             'separator' => ':',
             'dispatchOnRegistration' => false,
+            'hasDispatchedCurrentRequest' => false,
             'registeredMethods' => []
         ] as $name => $value) {
             $this->setDispatchProperty($name, $value);
