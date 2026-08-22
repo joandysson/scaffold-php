@@ -9,9 +9,16 @@ WORKDIR /app
 COPY --from=composer:2.9.8 /usr/bin/composer /usr/local/bin/composer
 
 RUN set -eux; \
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev libzip-dev; \
-    apk add --no-cache git icu-libs libzip unzip; \
-    docker-php-ext-install pdo_mysql intl zip
+    apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        curl-dev \
+        icu-dev \
+        lexbor-dev \
+        libxml2-dev \
+        libzip-dev \
+        oniguruma-dev; \
+    apk add --no-cache curl git icu-libs lexbor libxml2 libzip oniguruma unzip; \
+    docker-php-ext-install curl dom intl mbstring pdo_mysql xmlwriter zip
 
 COPY composer.json composer.lock ./
 COPY tests ./tests
@@ -38,9 +45,17 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /var/www/html
 
 RUN set -eux; \
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev libzip-dev linux-headers; \
-    apk add --no-cache icu-libs libzip nginx; \
-    docker-php-ext-install pdo_mysql intl zip; \
+    apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        curl-dev \
+        icu-dev \
+        lexbor-dev \
+        libxml2-dev \
+        libzip-dev \
+        linux-headers \
+        oniguruma-dev; \
+    apk add --no-cache curl icu-libs lexbor libxml2 libzip nginx oniguruma; \
+    docker-php-ext-install curl dom intl mbstring pdo_mysql xmlwriter zip; \
     if [ "$APP_STAGE" = "local" ]; then \
         pecl install xdebug; \
         docker-php-ext-enable xdebug; \
