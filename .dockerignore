@@ -2,10 +2,15 @@
 .github/
 .agents/
 .specify/
+.codex/
+.phpunit.cache/
+.vscode/
 vendor/
 node_modules/
-Dockerfile
 docker-compose.yml
-storage/
+docs/*
+!docs/api.json
+storage/*.log
+storage/cache/
 .env
 AGENTS.md

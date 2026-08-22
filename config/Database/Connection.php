@@ -32,17 +32,18 @@ abstract class Connection
             PDO::ATTR_TIMEOUT => 2,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci'
         ];
 
         self::$conn = new PDO(
-            $db['DB_DRIVER'] . ':host=' . $db['DB_HOST'] . ';dbname=' . $db['DB_NAME'] . ';charset=utf8',
+            $db['DB_DRIVER'] . ':host=' . $db['DB_HOST'] . ';dbname=' . $db['DB_NAME']
+            . ';charset=utf8mb4',
             $db['DB_USER'],
             $db['DB_PASSWORD'],
             $options
         );
 
         self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        self::$conn->exec('SET collation_connection = utf8mb4_general_ci');
     }
 
     protected static function getConnection(): PDO
