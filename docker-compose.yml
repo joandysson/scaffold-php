@@ -17,7 +17,7 @@ services:
         container_name: composer
         image: scaffold-php-app
         volumes:
-        - ./:/var/www/html
+            - ./:/var/www/html
         working_dir: /var/www/html
         command: composer install
         depends_on:
@@ -27,7 +27,7 @@ services:
         image: scaffold-php-app
         build:
             context: .
-            dockerfile: docker/php/Dockerfile
+            dockerfile: Dockerfile
             args:
                 APP_STAGE: ${APP_STAGE}
                 XDEBUG_MODE: ${XDEBUG_MODE}
@@ -39,6 +39,7 @@ services:
         volumes:
             - .:/var/www/html
             - ./docker/php/config/php.ini:/usr/local/etc/php/php.ini
+            - ./docker/config/nginx.conf:/etc/nginx/http.d/default.conf:ro
         depends_on:
             - db
         ports:
