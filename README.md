@@ -11,7 +11,7 @@ Este projeto fornece uma estrutura inicial simples em PHP para aplicações que 
 ### Tecnologias utilizadas
 
 - PHP `8.2`
-- MySQL `10`
+- MySQL `11.8.6`
 - Adminer para gerência do banco de dados
 
 O `BaseModel` usa uma conexão com o banco de dados que é aberta apenas quando
